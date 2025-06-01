@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useVehicle } from "@/hooks/useVehicle";
 import { useVehicleUnavailability } from "@/hooks/useVehicleUnavailability";
+import { useReviews } from "@/hooks/useReviews";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/Calendar";
@@ -23,6 +24,11 @@ export default function VehicleDetailsPage() {
     isLoading: isLoadingUnavailability,
     error: unavailabilityError,
   } = useVehicleUnavailability({ vehicleId });
+  const {
+    reviews,
+    isLoading: isLoadingReviews,
+    error: reviewsError,
+  } = useReviews({ vehicleId });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedDateRange, setSelectedDateRange] = useState<{
     startDate: Date | null;
@@ -628,6 +634,58 @@ export default function VehicleDetailsPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="glass rounded-4xl p-8 shadow-2xl border-2 border-primary-200 mt-12">
+          <h3 className="text-2xl font-bold gradient-text mb-6 flex items-center">
+            <div className="w-8 h-8 btn-gradient rounded-xl flex items-center justify-center mr-3">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 10h8M8 14h4m-6 4h12a2 2 0 002-2V8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            Comentarios
+          </h3>
+          {isLoadingReviews ? (
+            <p className="text-gray-500">Cargando comentarios...</p>
+          ) : reviewsError ? (
+            <p className="text-red-500">
+              Error al cargar comentarios: {reviewsError}
+            </p>
+          ) : reviews.length === 0 ? (
+            <p className="text-gray-500">
+              No hay comentarios para este vehículo.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {reviews.map((review) => (
+                <li
+                  key={review.id}
+                  className="p-4 bg-gradient-to-r from-primary-50 to-accent-50 shadow rounded-lg"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-500">
+                      {new Date(review.createdAt).toLocaleDateString("es-CO")}
+                    </span>
+                    <span className="text-sm font-semibold text-yellow-500">
+                      {"★".repeat(review.rating)}
+                    </span>
+                  </div>
+                  <p className="text-gray-700">{review.comment}</p>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </main>
     </div>
