@@ -4,12 +4,21 @@ import VehicleCard from "@/components/ui/VehicleCard";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
+import { useSearchParams } from "next/navigation";
 
 export default function VehiclesPage() {
+  const searchParams = useSearchParams();
+  const successMessage = searchParams.get("message");
   const { vehicles, isLoading, error, refreshVehicles } = useVehicles();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 auth-pattern">
+      {successMessage && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Alert type="success" message={successMessage} onClose={() => {}} />
+        </div>
+      )}
+
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary-200 to-accent-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-pulse"></div>
