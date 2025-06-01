@@ -44,7 +44,6 @@ export default function VehicleDetailsPage() {
       day: "numeric",
     });
   };
-
   const handleDateRangeSelect = (
     startDate: Date | null,
     endDate: Date | null
@@ -52,20 +51,32 @@ export default function VehicleDetailsPage() {
     setSelectedDateRange({ startDate, endDate });
   };
 
-  const calculateTotalPrice = () => {
-    if (
-      !selectedDateRange.startDate ||
-      !selectedDateRange.endDate ||
-      !vehicle
-    ) {
+  const calculateDays = () => {
+    if (!selectedDateRange.startDate || !selectedDateRange.endDate) {
       return 0;
     }
-    const days = Math.ceil(
-      (selectedDateRange.endDate.getTime() -
-        selectedDateRange.startDate.getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-    return parseFloat(vehicle.daily_price) * days;
+
+    // Crear fechas normalizadas para asegurar el cálculo correcto
+    const startDate = new Date(selectedDateRange.startDate);
+    const endDate = new Date(selectedDateRange.endDate);
+
+    // Normalizar las horas para el cálculo
+    startDate.setHours(0, 0, 0, 0); // 12:00 AM del día de inicio
+    endDate.setHours(23, 59, 59, 999); // 11:59 PM del día de fin
+
+    // Calcular la diferencia en milisegundos y convertir a días
+    const timeDifference = endDate.getTime() - startDate.getTime();
+    const days = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+    // Asegurar que siempre sea al menos 1 día (cuando inicio y fin son el mismo día)
+    return Math.max(1, days);
+  };
+
+  const calculateTotalPrice = () => {
+    if (!vehicle) {
+      return 0;
+    }
+    return parseFloat(vehicle.daily_price) * calculateDays();
   };
 
   if (isLoading) {
@@ -321,14 +332,9 @@ export default function VehicleDetailsPage() {
                       </h4>
                       <p className="text-3xl font-bold gradient-text mb-2">
                         {formatPrice(calculateTotalPrice().toString())}
-                      </p>
+                      </p>{" "}
                       <p className="text-sm text-secondary-600">
-                        {Math.ceil(
-                          (selectedDateRange.endDate.getTime() -
-                            selectedDateRange.startDate.getTime()) /
-                            (1000 * 60 * 60 * 24)
-                        )}{" "}
-                        día(s) de alquiler
+                        {calculateDays()} día(s) de alquiler
                       </p>
                     </div>
 
@@ -572,25 +578,6 @@ export default function VehicleDetailsPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-primary-200">
-              <Button variant="outline" size="md" className="w-full md:w-auto">
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-                Contactar Propietario
-              </Button>
             </div>
           </div>
         </div>

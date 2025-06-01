@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { cn } from "@/lib/utils/utils";
+import { cn, calculateRentalDays } from "@/lib/utils/utils";
 
 interface CalendarProps {
   className?: string;
@@ -394,15 +394,12 @@ export const Calendar: React.FC<CalendarProps> = ({
                         </span>
                       </div>
                       <div className="flex items-center justify-between pt-2 border-t border-primary-200">
+                        {" "}
                         <span className="text-sm text-secondary-600">
                           Duración:
                         </span>
                         <span className="text-sm font-bold text-primary-600">
-                          {Math.ceil(
-                            (range.endDate.getTime() -
-                              range.startDate.getTime()) /
-                              (1000 * 60 * 60 * 24)
-                          )}{" "}
+                          {calculateRentalDays(range.startDate, range.endDate)}{" "}
                           día(s)
                         </span>
                       </div>
