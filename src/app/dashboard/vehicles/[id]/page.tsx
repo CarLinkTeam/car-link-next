@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/Calendar";
 import Image from "next/image";
 import { useState } from "react";
+import { useRentalStore } from "@/store/rental-store";
 
 export default function VehicleDetailsPage() {
   const params = useParams();
@@ -27,6 +28,15 @@ export default function VehicleDetailsPage() {
     startDate: Date | null;
     endDate: Date | null;
   }>({ startDate: null, endDate: null });
+  const rentalStore = useRentalStore();
+  const {
+    isLoading: isRentalLoading,
+    error: rentalError,
+    success: rentalSuccess,
+    createRental,
+    clearStatus,
+  } = rentalStore;
+
   // Format price to show in Colombian pesos
   const formatPrice = (price: string) => {
     const numPrice = parseFloat(price);
@@ -62,7 +72,7 @@ export default function VehicleDetailsPage() {
 
     // Normalizar las horas para el cálculo
     startDate.setHours(0, 0, 0, 0); // 12:00 AM del día de inicio
-    endDate.setHours(23, 59, 59, 999); // 11:59 PM del día de fin
+    endDate.setHours(23, 59, 59, 900); // 11:59 PM del día de fin
 
     // Calcular la diferencia en milisegundos y convertir a días
     const timeDifference = endDate.getTime() - startDate.getTime();
@@ -77,6 +87,30 @@ export default function VehicleDetailsPage() {
       return 0;
     }
     return parseFloat(vehicle.daily_price) * calculateDays();
+  };
+
+  const handleRental = async () => {
+    if (!selectedDateRange.startDate || !selectedDateRange.endDate || !vehicle)
+      return;
+
+    const rentalData = {
+      vehicle_id: vehicle.id,
+      initialDate: selectedDateRange.startDate,
+      finalDate: selectedDateRange.endDate,
+      totalCost: calculateTotalPrice(),
+      status: "pending" as const,
+    };
+
+    try {
+      await createRental(rentalData);
+      router.push(
+        `/dashboard/vehicles?message=${encodeURIComponent(
+          "Reservado con éxito. Se informará al dueño para la aprobación de la renta."
+        )}`
+      );
+    } catch (error) {
+      console.error("Error al crear la renta:", error);
+    }
   };
 
   if (isLoading) {
@@ -375,22 +409,31 @@ export default function VehicleDetailsPage() {
                     </div>
 
                     {/* Rent Button */}
-                    <Button variant="primary" size="lg" className="w-full">
-                      <svg
-                        className="w-5 h-5 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3a4 4 0 118 0v4m-4 8c0 4.5-3 8-8 8s-8-3.5-8-8c0-2.5 1-4 3-4h10c2 0 3 1.5 3 4z"
-                        />
-                      </svg>
-                      Confirmar Reserva
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      className="w-full"
+                      onClick={handleRental}
+                      disabled={isRentalLoading}
+                    >
+                      {isRentalLoading ? "Procesando..." : "Confirmar Reserva"}
                     </Button>
+
+                    {/* Success or Error Message */}
+                    {rentalSuccess && (
+                      <Alert
+                        type="success"
+                        message="Reserva creada exitosamente."
+                        onClose={clearStatus}
+                      />
+                    )}
+                    {rentalError && (
+                      <Alert
+                        type="error"
+                        message={`Error al crear la reserva: ${rentalError}`}
+                        onClose={clearStatus}
+                      />
+                    )}
                   </div>
                 ) : (
                   <div className="text-center p-6 bg-gradient-to-r from-secondary-50 to-primary-50 rounded-3xl">

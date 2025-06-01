@@ -14,7 +14,6 @@ export const VehicleService = {
    */
   getAll: async (): Promise<Vehicle[]> => {
     const response = await apiClient.get<Vehicle[]>("/vehicles");
-    console.log("VehicleService.getAll response:", response);
     return response;
   },
 
