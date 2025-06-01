@@ -10,6 +10,7 @@ interface AuthState {
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
+  _hasHydrated: boolean
 
   // Actions
   login: (data: LoginFormData) => Promise<void>
@@ -17,6 +18,7 @@ interface AuthState {
   logout: () => void
   clearError: () => void
   setLoading: (loading: boolean) => void
+  setHasHydrated: (state: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -27,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+      _hasHydrated: false,
 
       /**
        * Maneja el proceso de login
@@ -102,14 +105,32 @@ export const useAuthStore = create<AuthState>()(
       setLoading: (loading) => {
         set({ isLoading: loading })
       },
+
+      /**
+       * Establece el estado de hidratación
+       */
+      setHasHydrated: (state) => {
+        set({ _hasHydrated: state })
+      },
     }),
     {
       name: 'auth-store',
       storage: createJSONStorage(() => localStorage),
+      // Incluir isAuthenticated en la persistencia y agregar hidratación
       partialize: (state) => ({
         token: state.token,
         user: state.user,
+        isAuthenticated: state.isAuthenticated,
       }),
+      // Hidratación automática
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // Si hay token y user, el usuario está autenticado
+          const isAuth = !!(state.token && state.user)
+          state.isAuthenticated = isAuth
+          state._hasHydrated = true
+        }
+      },
     }
   )
 )
