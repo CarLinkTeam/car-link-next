@@ -1,17 +1,57 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { useAuthStore } from '@/store/auth-store'
 
 export default function AccessDeniedPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { isAuthenticated, logout } = useAuthStore()
+
+  const reason = searchParams.get('reason')
+
+  const getMessages = () => {
+    switch (reason) {
+      case 'invalid-token':
+        return {
+          title: 'Token Inválido',
+          description: 'Tu sesión ha expirado o el token de autenticación no es válido.',
+          suggestion: 'Por favor, inicia sesión nuevamente para continuar.',
+        }
+      case 'unauthorized':
+        return {
+          title: 'Sin Permisos',
+          description: 'No tienes los permisos necesarios para acceder a esta página.',
+          suggestion: 'Contacta al administrador si crees que esto es un error.',
+        }
+      case 'session-invalid':
+        return {
+          title: 'Sesión Inválida',
+          description: 'Tu sesión es inválida o ha ocurrido un error de autenticación.',
+          suggestion: 'Por favor, inicia sesión nuevamente para continuar.',
+        }
+      case 'no-token':
+        return {
+          title: 'Acceso Restringido',
+          description: 'Esta página requiere autenticación para acceder.',
+          suggestion: 'Inicia sesión para continuar.',
+        }
+      default:
+        return {
+          title: 'Acceso Denegado',
+          description: 'No tienes permisos para acceder a esta página o tu sesión ha expirado.',
+          suggestion: 'Por favor, verifica tus credenciales e intenta nuevamente.',
+        }
+    }
+  }
+
+  const messages = getMessages()
 
   const handleGoHome = () => {
     if (isAuthenticated) {
-      router.push('/dashboard')
+      router.push('/dashboard/vehicles')
     } else {
       router.push('/')
     }
@@ -21,6 +61,8 @@ export default function AccessDeniedPage() {
     logout()
     router.push('/auth/login')
   }
+
+  const shouldShowLogout = isAuthenticated && ['invalid-token', 'session-invalid'].includes(reason || '')
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex items-center justify-center p-4'>
@@ -48,11 +90,25 @@ export default function AccessDeniedPage() {
         {/* Content */}
         <div className='space-y-6 animate-fade-in'>
           <div>
-            <h1 className='text-4xl md:text-5xl font-bold gradient-text mb-4'>Acceso Denegado</h1>
-            <p className='text-lg text-secondary-600 max-w-lg mx-auto mb-2'>
-              No tienes permisos para acceder a esta página o tu sesión ha expirado.
-            </p>
-            <p className='text-sm text-secondary-500'>Por favor, verifica tus credenciales e intenta nuevamente.</p>
+            <h1 className='text-4xl md:text-5xl font-bold gradient-text mb-4'>{messages.title}</h1>
+            <p className='text-lg text-secondary-600 max-w-lg mx-auto mb-2'>{messages.description}</p>
+            <p className='text-sm text-secondary-500'>{messages.suggestion}</p>
+
+            {reason && (
+              <div className='mt-4 glass rounded-xl p-4 inline-block'>
+                <div className='flex items-center gap-2 text-sm text-secondary-600'>
+                  <svg className='w-4 h-4 text-amber-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z'
+                    />
+                  </svg>
+                  <span>Código: {reason.toUpperCase()}</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -71,22 +127,24 @@ export default function AccessDeniedPage() {
                   Ir al Dashboard
                 </Button>
 
-                <Button
-                  variant='outline'
-                  size='lg'
-                  className='w-full sm:w-auto border-primary-300 text-primary-600 hover:bg-primary-50 transition-all duration-200'
-                  onClick={handleLogout}
-                >
-                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1'
-                    />
-                  </svg>
-                  Cerrar sesión
-                </Button>
+                {shouldShowLogout && (
+                  <Button
+                    variant='outline'
+                    size='lg'
+                    className='w-full sm:w-auto border-primary-300 text-primary-600 hover:bg-primary-50 transition-all duration-200'
+                    onClick={handleLogout}
+                  >
+                    <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1'
+                      />
+                    </svg>
+                    Renovar sesión
+                  </Button>
+                )}
               </>
             ) : (
               <>
