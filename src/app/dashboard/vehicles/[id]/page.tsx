@@ -222,57 +222,93 @@ export default function VehicleDetailsPage() {
 
         {/* Vehicle Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-          {/* Image Gallery */}
-          <div className="glass rounded-4xl p-6 shadow-2xl border-2 border-primary-200">
-            <div className="mb-6">
-              <div className="relative h-96 w-full overflow-hidden rounded-3xl">
-                <Image
-                  src={
-                    vehicle.url_photos && vehicle.url_photos.length > 0
-                      ? vehicle.url_photos[currentImageIndex]
-                      : "/placeholder-car.svg"
-                  }
-                  alt={`${vehicle.make} ${vehicle.vehicleModel} - Imagen ${
-                    currentImageIndex + 1
-                  }`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+          {/* Image Gallery and Rental Conditions */}
+          <div className="flex flex-col space-y-6">
+            {/* Image Gallery */}
+            <div className="glass rounded-4xl p-6 shadow-2xl border-2 border-primary-200">
+              <div className="mb-6">
+                <div className="relative h-96 w-full overflow-hidden rounded-3xl">
+                  <Image
+                    src={
+                      vehicle.url_photos && vehicle.url_photos.length > 0
+                        ? vehicle.url_photos[currentImageIndex]
+                        : "/placeholder-car.svg"
+                    }
+                    alt={`${vehicle.make} ${vehicle.vehicleModel} - Imagen ${
+                      currentImageIndex + 1
+                    }`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
 
-                {/* Vehicle class badge */}
-                <div className="absolute top-4 left-4">
-                  <span className="btn-gradient text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">
-                    {vehicle.class}
-                  </span>
+                  {/* Vehicle class badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className="btn-gradient text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg">
+                      {vehicle.class}
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Image Thumbnails */}
+              {vehicle.url_photos.length > 1 && (
+                <div className="flex space-x-3 overflow-x-auto pb-2">
+                  {vehicle.url_photos.map((photo, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`relative flex-shrink-0 h-20 w-28 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                        index === currentImageIndex
+                          ? "border-primary-500 shadow-lg scale-105"
+                          : "border-gray-200 hover:border-primary-300"
+                      }`}
+                    >
+                      <Image
+                        src={photo}
+                        alt={`Miniatura ${index + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="112px"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Image Thumbnails */}
-            {vehicle.url_photos.length > 1 && (
-              <div className="flex space-x-3 overflow-x-auto pb-2">
-                {vehicle.url_photos.map((photo, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`relative flex-shrink-0 h-20 w-28 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
-                      index === currentImageIndex
-                        ? "border-primary-500 shadow-lg scale-105"
-                        : "border-gray-200 hover:border-primary-300"
-                    }`}
+            {/* Rental Conditions */}
+            <div className="glass rounded-4xl p-8 shadow-2xl border-2 border-primary-200 flex flex-col justify-between h-full">
+              <h3 className="text-2xl font-bold gradient-text mb-6 flex items-center">
+                <div className="w-8 h-8 btn-gradient rounded-xl flex items-center justify-center mr-3">
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <Image
-                      src={photo}
-                      alt={`Miniatura ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="112px"
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
-                  </button>
-                ))}
+                  </svg>
+                </div>
+                Condiciones de Renta
+              </h3>
+              <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-3xl p-6">
+                <ul className="list-disc list-inside text-secondary-700 leading-relaxed text-lg space-y-2">
+                  <li>Prohibido fumar.</li>
+                  <li>
+                    Se admiten mascotas con costo adicional de $20.000/día.
+                  </li>
+                  <li>Mínimo 2 días de alquiler.</li>
+                  <li>El vehículo debe devolverse con el tanque lleno.</li>
+                  <li>Se requiere licencia de conducir válida.</li>
+                </ul>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Vehicle Information */}
@@ -382,94 +418,10 @@ export default function VehicleDetailsPage() {
                 )}
               </div>
             </div>
-
-            {/* Technical Specifications */}
-            <div className="glass rounded-4xl p-8 shadow-2xl border-2 border-primary-200">
-              <h3 className="text-2xl font-bold gradient-text mb-6 flex items-center">
-                <div className="w-8 h-8 btn-gradient rounded-xl flex items-center justify-center mr-3">
-                  <svg
-                    className="w-4 h-4 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                Especificaciones Técnicas
-              </h3>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-3">🎨</span>
-                    <span className="text-sm text-secondary-600 font-medium">
-                      Color
-                    </span>
-                  </div>
-                  <p className="font-bold text-secondary-800">
-                    {vehicle.color}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-3">⛽</span>
-                    <span className="text-sm text-secondary-600 font-medium">
-                      Combustible
-                    </span>
-                  </div>
-                  <p className="font-bold text-secondary-800">
-                    {vehicle.fuel_type}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-3">⚙️</span>
-                    <span className="text-sm text-secondary-600 font-medium">
-                      Transmisión
-                    </span>
-                  </div>
-                  <p className="font-bold text-secondary-800">
-                    {vehicle.transmission}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-3">🚗</span>
-                    <span className="text-sm text-secondary-600 font-medium">
-                      Tracción
-                    </span>
-                  </div>
-                  <p className="font-bold text-secondary-800">
-                    {vehicle.drive}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4 col-span-2">
-                  <div className="flex items-center mb-2">
-                    <span className="text-2xl mr-3">🔢</span>
-                    <span className="text-sm text-secondary-600 font-medium">
-                      Placa
-                    </span>
-                  </div>
-                  <p className="font-bold text-secondary-800">
-                    {vehicle.license_plate}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Rental Conditions */}
+        {/* Technical Specifications */}
         <div className="glass rounded-4xl p-8 shadow-2xl border-2 border-primary-200 mb-12">
           <h3 className="text-2xl font-bold gradient-text mb-6 flex items-center">
             <div className="w-8 h-8 btn-gradient rounded-xl flex items-center justify-center mr-3">
@@ -483,16 +435,69 @@ export default function VehicleDetailsPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </div>
-            Condiciones de Renta
+            Especificaciones Técnicas
           </h3>
-          <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-3xl p-6">
-            <p className="text-secondary-700 leading-relaxed text-lg">
-              {vehicle.rental_conditions}
-            </p>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-3">🎨</span>
+                <span className="text-sm text-secondary-600 font-medium">
+                  Color
+                </span>
+              </div>
+              <p className="font-bold text-secondary-800">{vehicle.color}</p>
+            </div>
+
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-3">⛽</span>
+                <span className="text-sm text-secondary-600 font-medium">
+                  Combustible
+                </span>
+              </div>
+              <p className="font-bold text-secondary-800">
+                {vehicle.fuel_type}
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-3">⚙️</span>
+                <span className="text-sm text-secondary-600 font-medium">
+                  Transmisión
+                </span>
+              </div>
+              <p className="font-bold text-secondary-800">
+                {vehicle.transmission}
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-3">🚗</span>
+                <span className="text-sm text-secondary-600 font-medium">
+                  Tracción
+                </span>
+              </div>
+              <p className="font-bold text-secondary-800">{vehicle.drive}</p>
+            </div>
+
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-2xl p-4 col-span-2">
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-3">🔢</span>
+                <span className="text-sm text-secondary-600 font-medium">
+                  Placa
+                </span>
+              </div>
+              <p className="font-bold text-secondary-800">
+                {vehicle.license_plate}
+              </p>
+            </div>
           </div>
         </div>
 
