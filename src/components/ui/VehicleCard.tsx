@@ -47,10 +47,15 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {" "}
       {/* Vehicle Image */}
       <div className="relative h-56 w-full overflow-hidden">
         <Image
-          src="/placeholder-car.svg"
+          src={
+            vehicle.url_photos && vehicle.url_photos.length > 0
+              ? vehicle.url_photos[currentImageIndex]
+              : "/placeholder-car.svg"
+          }
           alt={`${vehicle.make} ${vehicle.vehicleModel} - Imagen ${
             currentImageIndex + 1
           }`}
@@ -85,7 +90,6 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           </div>
         )}
       </div>
-
       {/* Vehicle Info */}
       <div className="p-6">
         {/* Make and Model */}
@@ -97,7 +101,6 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
             {vehicle.make} • {vehicle.year}
           </p>
         </div>
-
         {/* Vehicle details */}
         <div className="mb-4 space-y-2">
           <div className="flex items-center text-sm text-secondary-600">
@@ -118,21 +121,17 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
             </div>
             <span className="font-medium">{vehicle.transmission}</span>
           </div>
-        </div>
-
+        </div>{" "}
         {/* Price */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-3xl font-bold gradient-text">
-              {formatPrice(vehicle.daily_price)}
-            </p>
-            <p className="text-sm text-secondary-500 font-medium">por día</p>
-          </div>
+        <div className="mb-4 text-center">
+          <p className="text-3xl font-bold gradient-text">
+            {formatPrice(vehicle.daily_price)}
+          </p>
+          <p className="text-sm text-secondary-500 font-medium mb-4">por día</p>
           <button className="btn-gradient text-white px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 hover:scale-105 hover:shadow-lg transform-gpu">
             Ver detalles
           </button>
         </div>
-
         {/* Owner info */}
         <div className="pt-4 border-t-2 border-primary-100">
           <div className="flex items-center text-sm text-secondary-600">

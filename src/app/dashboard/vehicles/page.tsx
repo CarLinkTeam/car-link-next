@@ -1,9 +1,13 @@
 "use client";
 
 import VehicleCard from "@/components/ui/VehicleCard";
-import { vehiclesData } from "@/lib/data/static-vehicles";
+import { useVehicles } from "@/hooks/useVehicles";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
 
 export default function VehiclesPage() {
+  const { vehicles, isLoading, error, refreshVehicles } = useVehicles();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 auth-pattern">
       {/* Background Elements */}
@@ -45,28 +49,54 @@ export default function VehiclesPage() {
 
       {/* Main Content */}
       <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {" "}
         {/* Search/Filter Section */}
         <div className="mb-12">
-          <div className="glass rounded-4xl p-8 floating-card shadow-2xl border-2 border-primary-200">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 btn-gradient rounded-xl flex items-center justify-center mr-4">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+          <div className="glass rounded-4xl p-8 shadow-2xl border-2 border-primary-200">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 btn-gradient rounded-xl flex items-center justify-center mr-4">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold gradient-text">
+                  Filtros y Búsqueda
+                </h2>
               </div>
-              <h2 className="text-2xl font-bold gradient-text">
-                Filtros y Búsqueda
-              </h2>
+              {error && (
+                <Button
+                  onClick={refreshVehicles}
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoading}
+                >
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Reintentar
+                </Button>
+              )}
             </div>
             <p className="text-secondary-600 text-lg">
               Utiliza los filtros para encontrar el vehículo perfecto que se
@@ -74,19 +104,66 @@ export default function VehiclesPage() {
             </p>
           </div>
         </div>
-
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-8">
+            <Alert
+              type="error"
+              message={`Error al cargar vehículos: ${error}`}
+              onClose={() => {}}
+            />
+          </div>
+        )}
+        {/* Loading State */}{" "}
+        {isLoading && (
+          <div className="flex justify-center items-center py-16">
+            <div className="glass rounded-4xl p-12 shadow-2xl border-2 border-primary-200">
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 btn-gradient rounded-2xl flex items-center justify-center mb-6 animate-pulse">
+                  <svg
+                    className="w-8 h-8 text-white animate-spin"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      className="opacity-25"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      className="opacity-75"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold gradient-text mb-2">
+                  Cargando vehículos...
+                </h3>
+                <p className="text-secondary-600">
+                  Por favor espera mientras obtenemos la información más
+                  reciente
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Vehicle Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {vehiclesData.map((vehicle) => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} />
-          ))}
-        </div>
-
-        {/* No vehicles fallback */}
-        {vehiclesData.length === 0 && (
+        {!isLoading && !error && vehicles && vehicles.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {vehicles.map((vehicle) => (
+              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+            ))}
+          </div>
+        )}
+        {/* No vehicles fallback */}{" "}
+        {!isLoading && !error && vehicles && vehicles.length === 0 && (
           <div className="text-center py-16">
-            <div className="glass rounded-4xl p-12 floating-card shadow-2xl border-2 border-primary-200 max-w-md mx-auto">
-              <div className="w-16 h-16 btn-gradient rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
+            <div className="glass rounded-4xl p-12 shadow-2xl border-2 border-primary-200 max-w-md mx-auto">
+              <div className="w-16 h-16 btn-gradient rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-8 h-8 text-white"
                   fill="none"
@@ -104,10 +181,25 @@ export default function VehiclesPage() {
               <h3 className="text-2xl font-bold gradient-text mb-4">
                 No hay vehículos disponibles
               </h3>
-              <p className="text-secondary-600">
-                No hay vehículos disponibles en este momento. Inténtalo más
-                tarde.
+              <p className="text-secondary-600 mb-6">
+                No hay vehículos disponibles en este momento.
               </p>
+              <Button onClick={refreshVehicles} variant="primary" size="md">
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Actualizar
+              </Button>
             </div>
           </div>
         )}
