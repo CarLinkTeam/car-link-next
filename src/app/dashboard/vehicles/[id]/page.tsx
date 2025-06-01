@@ -2,8 +2,10 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useVehicle } from "@/hooks/useVehicle";
+import { useVehicleUnavailability } from "@/hooks/useVehicleUnavailability";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
+import { Calendar } from "@/components/ui/Calendar";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -14,8 +16,17 @@ export default function VehicleDetailsPage() {
   const { vehicle, isLoading, error, refreshVehicle } = useVehicle({
     id: vehicleId,
   });
+  const {
+    unavailableDates,
+    isDateUnavailable,
+    isLoading: isLoadingUnavailability,
+    error: unavailabilityError,
+  } = useVehicleUnavailability({ vehicleId });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  const [selectedDateRange, setSelectedDateRange] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({ startDate: null, endDate: null });
   // Format price to show in Colombian pesos
   const formatPrice = (price: string) => {
     const numPrice = parseFloat(price);
@@ -32,6 +43,29 @@ export default function VehicleDetailsPage() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handleDateRangeSelect = (
+    startDate: Date | null,
+    endDate: Date | null
+  ) => {
+    setSelectedDateRange({ startDate, endDate });
+  };
+
+  const calculateTotalPrice = () => {
+    if (
+      !selectedDateRange.startDate ||
+      !selectedDateRange.endDate ||
+      !vehicle
+    ) {
+      return 0;
+    }
+    const days = Math.ceil(
+      (selectedDateRange.endDate.getTime() -
+        selectedDateRange.startDate.getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
+    return parseFloat(vehicle.daily_price) * days;
   };
 
   if (isLoading) {
@@ -247,26 +281,99 @@ export default function VehicleDetailsPage() {
                 </p>
                 <p className="text-lg text-secondary-600 font-medium">
                   por día
-                </p>
+                </p>{" "}
+              </div>{" "}
+              {/* Calendar */}
+              <div className="mb-6">
+                {isLoadingUnavailability && (
+                  <div className="text-center py-4">
+                    <p className="text-secondary-600">
+                      Cargando disponibilidad...
+                    </p>
+                  </div>
+                )}
+                {unavailabilityError && (
+                  <div className="mb-4">
+                    <Alert
+                      type="error"
+                      message={`Error al cargar disponibilidad: ${unavailabilityError}`}
+                      onClose={() => {}}
+                    />
+                  </div>
+                )}
+                <Calendar
+                  mode="range"
+                  onDateRangeSelect={handleDateRangeSelect}
+                  selectedRange={selectedDateRange}
+                  className="w-full"
+                  unavailableDates={unavailableDates}
+                  isDateUnavailable={isDateUnavailable}
+                />
               </div>{" "}
               {/* Action Button */}
               <div className="w-full">
-                <Button variant="primary" size="lg" className="w-full">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3a4 4 0 118 0v4m-4 8c0 4.5-3 8-8 8s-8-3.5-8-8c0-2.5 1-4 3-4h10c2 0 3 1.5 3 4z"
-                    />
-                  </svg>
-                  Rentar Ahora
-                </Button>
+                {selectedDateRange.startDate && selectedDateRange.endDate ? (
+                  <div className="space-y-4">
+                    {/* Total Price Display */}
+                    <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-3xl p-6 text-center">
+                      <h4 className="text-lg font-semibold text-secondary-800 mb-2">
+                        Precio Total
+                      </h4>
+                      <p className="text-3xl font-bold gradient-text mb-2">
+                        {formatPrice(calculateTotalPrice().toString())}
+                      </p>
+                      <p className="text-sm text-secondary-600">
+                        {Math.ceil(
+                          (selectedDateRange.endDate.getTime() -
+                            selectedDateRange.startDate.getTime()) /
+                            (1000 * 60 * 60 * 24)
+                        )}{" "}
+                        día(s) de alquiler
+                      </p>
+                    </div>
+
+                    {/* Rent Button */}
+                    <Button variant="primary" size="lg" className="w-full">
+                      <svg
+                        className="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3a4 4 0 118 0v4m-4 8c0 4.5-3 8-8 8s-8-3.5-8-8c0-2.5 1-4 3-4h10c2 0 3 1.5 3 4z"
+                        />
+                      </svg>
+                      Confirmar Reserva
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center p-6 bg-gradient-to-r from-secondary-50 to-primary-50 rounded-3xl">
+                    <svg
+                      className="w-12 h-12 text-secondary-400 mx-auto mb-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3a4 4 0 118 0v4m-4 8c0 4.5-3 8-8 8s-8-3.5-8-8c0-2.5 1-4 3-4h10c2 0 3 1.5 3 4z"
+                      />
+                    </svg>
+                    <h4 className="text-lg font-semibold text-secondary-700 mb-2">
+                      Selecciona las fechas
+                    </h4>
+                    <p className="text-sm text-secondary-500">
+                      Elige las fechas de inicio y fin para ver el precio total
+                      y confirmar tu reserva
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
