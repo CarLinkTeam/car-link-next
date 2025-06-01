@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AuthGuard } from "@/components/guards/AuthGuard";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CarLink - Alquiler de Vehículos",
-  description:
-    "Plataforma de alquiler de vehículos entre particulares. Encuentra el auto perfecto para tu próximo viaje.",
+  title: "CarLink - Renta de Carros",
+  description: "Plataforma de alquiler de vehículos",
 };
 
 export default function RootLayout({
@@ -24,11 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthGuard>{children}</AuthGuard>
       </body>
     </html>
   );

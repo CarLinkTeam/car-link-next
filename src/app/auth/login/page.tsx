@@ -4,17 +4,14 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/auth-store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 
 export default function LoginPage() {
-  const { login, isLoading, error, clearError } = useAuth({
-    requireAuth: false,
-    redirectTo: "/dashboard/vehicles",
-  });
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const {
     register,
@@ -41,7 +38,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data);
-      // La redirección se maneja automáticamente por el hook useAuth
+      // AuthGuard se encarga automáticamente de la redirección
     } catch (err) {
       // El error se maneja en el store
       console.error("Login error:", err);

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuthStore } from '@/store/auth-store'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Alert } from '@/components/ui/Alert'
@@ -16,10 +16,7 @@ export default function RegisterPage() {
     isLoading,
     error,
     clearError,
-  } = useAuth({
-    requireAuth: false,
-    redirectTo: '/dashboard',
-  })
+  } = useAuthStore()
 
   const {
     register,
@@ -53,7 +50,7 @@ export default function RegisterPage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...registerData } = data
       await registerUser(registerData)
-      // La redirección se maneja automáticamente por el hook useAuth
+      // AuthGuard se encarga automáticamente de la redirección
     } catch (err) {
       // El error se maneja en el store
       console.error('Register error:', err)
