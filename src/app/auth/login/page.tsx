@@ -13,7 +13,7 @@ import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 export default function LoginPage() {
   const { login, isLoading, error, clearError } = useAuth({
     requireAuth: false,
-    redirectTo: "/dashboard",
+    redirectTo: "/dashboard/vehicles",
   });
 
   const {
