@@ -1,10 +1,10 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 /* Variables CSS personalizadas para CarLink */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  
+
   /* Colores Primary (Rojos) - CarLink */
   --primary-50: #fef2f2;
   --primary-100: #fee2e2;
@@ -16,7 +16,7 @@
   --primary-700: #b91c1c;
   --primary-800: #991b1b;
   --primary-900: #7f1d1d;
-  
+
   /* Colores Secondary (Grises) */
   --secondary-50: #fafafa;
   --secondary-100: #f4f4f5;
@@ -28,7 +28,7 @@
   --secondary-700: #3f3f46;
   --secondary-800: #27272a;
   --secondary-900: #18181b;
-  
+
   /* Colores Accent (Naranjas) */
   --accent-50: #fff7ed;
   --accent-100: #ffedd5;
@@ -47,7 +47,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+
   /* Configurar colores primary */
   --color-primary-50: var(--primary-50);
   --color-primary-100: var(--primary-100);
@@ -59,7 +59,7 @@
   --color-primary-700: var(--primary-700);
   --color-primary-800: var(--primary-800);
   --color-primary-900: var(--primary-900);
-  
+
   /* Configurar colores secondary */
   --color-secondary-50: var(--secondary-50);
   --color-secondary-100: var(--secondary-100);
@@ -71,7 +71,7 @@
   --color-secondary-700: var(--secondary-700);
   --color-secondary-800: var(--secondary-800);
   --color-secondary-900: var(--secondary-900);
-  
+
   /* Configurar colores accent */
   --color-accent-50: var(--accent-50);
   --color-accent-100: var(--accent-100);
@@ -83,7 +83,7 @@
   --color-accent-700: var(--accent-700);
   --color-accent-800: var(--accent-800);
   --color-accent-900: var(--accent-900);
-  
+
   /* Animaciones personalizadas */
   --animate-fade-in: fadeIn 0.3s ease-in-out;
   --animate-fade-out: fadeOut 0.3s ease-in-out;
@@ -94,57 +94,101 @@
   --animate-float: float 1.5s ease-in-out infinite;
   --animate-glow: glow 1s ease-in-out infinite alternate;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  
+
   /* Radios de borde personalizados */
   --radius-4xl: 2rem;
   --radius-5xl: 3rem;
-  
+
   /* Sombras personalizadas */
   --shadow-glow: 0 0 15px rgba(239, 68, 68, 0.3);
   --shadow-glow-lg: 0 0 25px rgba(239, 68, 68, 0.4);
   --shadow-red-glow: 0 0 20px rgba(220, 38, 38, 0.5);
-  --shadow-inner-lg: inset 0 10px 15px -3px rgba(0, 0, 0, 0.1), inset 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-inner-lg: inset 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    inset 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Keyframes para animaciones */
 @keyframes fadeIn {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeOut {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-8px); }
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes slideUp {
-  0% { transform: translateY(100%); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideDown {
-  0% { transform: translateY(-100%); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  0% { transform: scale(0.95); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes reverse-spin {
-  0% { transform: rotate(360deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes glow {
-  0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
-  100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8), 0 0 25px rgba(220, 38, 38, 0.4); }
+  0% {
+    box-shadow: 0 0 5px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.8), 0 0 25px rgba(220, 38, 38, 0.4);
+  }
 }
 
 /* Forzar tema claro para CarLink con mejor contraste */
@@ -179,7 +223,12 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #dc2626 0%,
+    #ef4444 50%,
+    #f97316 100%
+  ) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -193,7 +242,12 @@ body {
 }
 
 .btn-gradient {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #dc2626 0%,
+    #ef4444 50%,
+    #f97316 100%
+  ) !important;
   border: none !important;
   color: white !important;
   transition: all 0.2s ease !important;
@@ -201,13 +255,23 @@ body {
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ea580c 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #b91c1c 0%,
+    #dc2626 50%,
+    #ea580c 100%
+  ) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 10px 30px rgba(220, 38, 38, 0.5) !important;
 }
 
 .btn-gradient-orange {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #f97316 0%,
+    #ea580c 50%,
+    #c2410c 100%
+  ) !important;
   border: none !important;
   color: white !important;
   transition: all 0.2s ease !important;
@@ -215,7 +279,12 @@ body {
 }
 
 .btn-gradient-orange:hover {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%) !important;
+  background: linear-gradient(
+    135deg,
+    #ea580c 0%,
+    #c2410c 50%,
+    #9a3412 100%
+  ) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 10px 30px rgba(249, 115, 22, 0.5) !important;
 }
@@ -239,10 +308,21 @@ body {
 }
 
 .auth-pattern {
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(220, 38, 38, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 40% 40%, rgba(239, 68, 68, 0.05) 0%, transparent 60%) !important;
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      rgba(220, 38, 38, 0.08) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(249, 115, 22, 0.08) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(239, 68, 68, 0.05) 0%,
+      transparent 60%
+    ) !important;
   background-size: 500px 500px, 300px 300px, 700px 700px !important;
   background-color: #ffffff !important;
 }
@@ -285,8 +365,8 @@ body {
 }
 
 /* Mejorar contraste de elementos de entrada */
-input, 
-textarea, 
+input,
+textarea,
 select {
   background-color: #ffffff !important;
   border-color: rgba(209, 213, 219, 0.8) !important;
@@ -334,4 +414,21 @@ select:focus {
 
 .border-primary-300 {
   border-color: #fca5a5 !important;
+}
+
+/* Clases de sombra personalizadas */
+.shadow-glow {
+  box-shadow: var(--shadow-glow) !important;
+}
+
+.shadow-glow-lg {
+  box-shadow: var(--shadow-glow-lg) !important;
+}
+
+.shadow-red-glow {
+  box-shadow: var(--shadow-red-glow) !important;
+}
+
+.shadow-inner-lg {
+  box-shadow: var(--shadow-inner-lg) !important;
 }
