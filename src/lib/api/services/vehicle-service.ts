@@ -54,4 +54,11 @@ export const VehicleService = {
     }`;
     return apiClient.get<VehicleListResponse>(url);
   },
+
+  /**
+   * Obtiene los vehículos del usuario actual
+   */
+  getMyVehicles: async (): Promise<Vehicle[]> => {
+    return apiClient.get<Vehicle[]>("/vehicles/myVehicles");
+  },
 };
