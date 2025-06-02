@@ -347,13 +347,16 @@ export default function VehicleDetailsPage() {
               </h3>
               <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-3xl p-6">
                 <ul className="list-disc list-inside text-secondary-700 leading-relaxed text-lg space-y-2">
-                  <li>Prohibido fumar.</li>
-                  <li>
-                    Se admiten mascotas con costo adicional de $20.000/día.
-                  </li>
-                  <li>Mínimo 2 días de alquiler.</li>
-                  <li>El vehículo debe devolverse con el tanque lleno.</li>
-                  <li>Se requiere licencia de conducir válida.</li>
+                  {vehicle.rental_conditions ? (
+                    vehicle.rental_conditions
+                      .split(".")
+                      .filter((condition) => condition.trim() !== "")
+                      .map((condition, index) => (
+                        <li key={index}>{condition.trim()}.</li>
+                      ))
+                  ) : (
+                    <li>No hay condiciones específicas disponibles.</li>
+                  )}
                 </ul>
               </div>
             </div>
