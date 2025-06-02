@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useVehicle } from "@/hooks/useVehicle";
 import { useVehicleUnavailability } from "@/hooks/useVehicleUnavailability";
+import { useReviews } from "@/hooks/useReviews";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/Calendar";
@@ -23,6 +24,11 @@ export default function VehicleDetailsPage() {
     isLoading: isLoadingUnavailability,
     error: unavailabilityError,
   } = useVehicleUnavailability({ vehicleId });
+  const {
+    reviews,
+    isLoading: isLoadingReviews,
+    error: reviewsError,
+  } = useReviews({ vehicleId });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedDateRange, setSelectedDateRange] = useState<{
     startDate: Date | null;
@@ -95,9 +101,9 @@ export default function VehicleDetailsPage() {
 
     const rentalData = {
       vehicle_id: vehicle.id,
-      initialDate: selectedDateRange.startDate,
-      finalDate: selectedDateRange.endDate,
-      totalCost: calculateTotalPrice(),
+      initialDate: selectedDateRange.startDate.toISOString(),
+      finalDate: selectedDateRange.endDate.toISOString(),
+      totalCost: calculateTotalPrice().toString(),
       status: "pending" as const,
     };
 
@@ -628,6 +634,96 @@ export default function VehicleDetailsPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="glass rounded-4xl p-8 shadow-2xl border-2 border-primary-200">
+          <h3 className="text-2xl font-bold gradient-text mb-6 flex items-center">
+            <div className="w-8 h-8 btn-gradient rounded-xl flex items-center justify-center mr-3">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 10h8M8 14h4m-6 4h12a2 2 0 002-2V8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            Comentarios
+          </h3>
+          {isLoadingReviews ? (
+            <p className="text-gray-500">Cargando comentarios...</p>
+          ) : reviewsError ? (
+            <p className="text-red-500">
+              Error al cargar comentarios: {reviewsError}
+            </p>
+          ) : reviews.length === 0 ? (
+            <p className="text-gray-500">
+              No hay comentarios para este vehículo.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {reviews.map((review) => (
+                <li
+                  key={review.id}
+                  className="p-6 bg-gradient-to-r from-primary-50 to-accent-50 shadow rounded-2xl border border-primary-100"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 btn-gradient rounded-xl flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">
+                          {review.rental?.client?.fullName
+                            ? review.rental.client.fullName
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()
+                            : "U"}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-secondary-800">
+                          {review.rental?.client?.fullName || "Usuario anónimo"}
+                        </h4>
+                        <span className="text-xs text-secondary-500">
+                          {new Date(review.createdAt).toLocaleDateString(
+                            "es-CO"
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg
+                          key={star}
+                          className={`w-4 h-4 ${
+                            star <= review.rating
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      ))}
+                      <span className="text-sm font-medium text-secondary-600 ml-1">
+                        ({review.rating}/5)
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-secondary-700 text-sm leading-relaxed">
+                    {review.comment}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </main>
     </div>
