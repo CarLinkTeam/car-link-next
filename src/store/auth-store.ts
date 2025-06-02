@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { LoginFormData, RegisterFormData } from "@/lib/validations/auth";
-import { User, AuthUser, UserRole } from "@/lib/types";
+import { AuthUser, UserRole } from "@/lib/types";
 import { auth } from "@/lib/api";
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -16,7 +16,7 @@ interface AuthState {
   login: (data: LoginFormData) => Promise<void>;
   register: (data: Omit<RegisterFormData, "confirmPassword">) => Promise<void>;
   logout: () => void;
-  updateUser: (userData: AuthUser) => void;
+  updateUser: (userData: Partial<AuthUser>) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   setHasHydrated: (state: boolean) => void;
@@ -95,7 +95,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             isAuthenticated: false,
           });
-          throw error;
+          // Siempre lanzar una instancia de Error
+          throw error instanceof Error ? error : new Error(message);
         }
       },
 
@@ -120,7 +121,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             isAuthenticated: false,
           });
-          throw error;
+          // Siempre lanzar una instancia de Error
+          throw error instanceof Error ? error : new Error(message);
         }
       },
 
