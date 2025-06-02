@@ -28,7 +28,7 @@ export type CreateRentalData = {
   vehicle_id: string;
   initialDate: string;
   finalDate: string;
-  totalCost: string;
+  totalCost: number;
   status?: RentalStatus;
 };
 

@@ -103,7 +103,7 @@ export default function VehicleDetailsPage() {
       vehicle_id: vehicle.id,
       initialDate: selectedDateRange.startDate.toISOString(),
       finalDate: selectedDateRange.endDate.toISOString(),
-      totalCost: calculateTotalPrice().toString(),
+      totalCost: calculateTotalPrice(),
       status: "pending" as const,
     };
 

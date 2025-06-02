@@ -21,6 +21,14 @@ export const RentalService = {
   },
 
   /**
+   * Obtiene las rentas de un owner autenticado
+   */
+  getOwnerRentals: async (): Promise<Rental[]> => {
+    const response = await apiClient.get<Rental[]>("/rentals/owner");
+    return response;
+  },
+
+  /**
    * Crea una review para una renta
    */
   createReview: async (data: CreateReviewData): Promise<Review> => {
@@ -42,4 +50,9 @@ export const RentalService = {
       return false;
     }
   },
+
+  updateById: async (id: string, data: Partial<Rental>): Promise<Rental> => {
+    const response = await apiClient.patch<Rental>(`/rentals/${id}`, data);
+    return response;
+  }
 };
