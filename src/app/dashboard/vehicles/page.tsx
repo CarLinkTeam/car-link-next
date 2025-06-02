@@ -4,12 +4,96 @@ import VehicleCard from "@/components/ui/VehicleCard";
 import { useVehicles } from "@/hooks/useVehicles";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
+import { useSearchParams } from "next/navigation";
+import { useState, useMemo } from "react";
 
 export default function VehiclesPage() {
-  const { vehicles, isLoading, error, refreshVehicles } = useVehicles();
+  const searchParams = useSearchParams();
+  const successMessage = searchParams.get("message");
+
+  // Estados para búsqueda y paginación
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
+  const {
+    vehicles: allVehicles,
+    isLoading,
+    error,
+    refreshVehicles,
+  } = useVehicles();
+
+  const filteredVehicles = useMemo(() => {
+    if (!allVehicles) return [];
+
+    return allVehicles.filter((vehicle) => {
+      const matchesSearch =
+        searchTerm.trim() === "" ||
+        vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vehicle.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesSearch;
+    });
+  }, [allVehicles, searchTerm]);
+
+  // Calcular paginación
+  const totalVehicles = filteredVehicles.length;
+  const totalPages = Math.ceil(totalVehicles / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const vehicles = filteredVehicles.slice(startIndex, endIndex);
+
+  // Reset página cuando se busca
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll hacia arriba cuando cambie la página
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const getPaginationButtons = () => {
+    const buttons = [];
+    const maxVisiblePages = 5;
+    const halfVisible = Math.floor(maxVisiblePages / 2);
+
+    let startPage = Math.max(1, currentPage - halfVisible);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(i);
+    }
+
+    return buttons;
+  };
+
+  // Debug logging
+  console.log("Debug - Page state:", {
+    searchTerm,
+    currentPage,
+    allVehicles: allVehicles?.length,
+    filteredVehicles: filteredVehicles?.length,
+    vehicles: vehicles?.length,
+    totalPages,
+    totalVehicles,
+    isLoading,
+    error,
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 auth-pattern">
+      {successMessage && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Alert type="success" message={successMessage} onClose={() => {}} />
+        </div>
+      )}
+
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary-200 to-accent-300 rounded-full mix-blend-multiply filter blur-xl opacity-40 animate-pulse"></div>
@@ -71,7 +155,7 @@ export default function VehiclesPage() {
                   </svg>
                 </div>
                 <h2 className="text-2xl font-bold gradient-text">
-                  Filtros y Búsqueda
+                  Buscar Vehículos
                 </h2>
               </div>
               {error && (
@@ -98,10 +182,63 @@ export default function VehiclesPage() {
                 </Button>
               )}
             </div>
-            <p className="text-secondary-600 text-lg">
-              Utiliza los filtros para encontrar el vehículo perfecto que se
-              adapte a tus necesidades
-            </p>
+
+            {/* Barra de búsqueda */}
+            <div className="mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar por marca o modelo..."
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-primary-200 focus:border-primary-500 focus:outline-none transition-colors text-lg"
+                />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <svg
+                    className="w-5 h-5 text-secondary-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                {searchTerm && (
+                  <button
+                    onClick={() => handleSearchChange("")}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 transition-colors"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Información de resultados */}
+            {totalVehicles !== undefined && (
+              <p className="text-secondary-600 text-lg">
+                {searchTerm
+                  ? `${totalVehicles} vehículo(s) encontrado(s) para "${searchTerm}"`
+                  : `${totalVehicles} vehículo(s) disponible(s)`}
+              </p>
+            )}
           </div>
         </div>
         {/* Error Alert */}
@@ -153,11 +290,128 @@ export default function VehiclesPage() {
         )}
         {/* Vehicle Grid */}
         {!isLoading && !error && vehicles && vehicles.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {vehicles.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {vehicles.map((vehicle) => (
+                <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              ))}
+            </div>
+
+            {/* Paginación */}
+            {(totalPages && totalPages > 1) ||
+            (searchTerm.length > 0 && totalVehicles !== undefined) ? (
+              <div className="mt-12 flex justify-center">
+                <div className="glass rounded-4xl p-6 shadow-2xl border-2 border-primary-200">
+                  {totalPages && totalPages > 1 && (
+                    <div className="flex items-center gap-2 mb-4">
+                      {/* Botón anterior */}
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-3 py-2 rounded-xl border-2 border-primary-200 text-secondary-700 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 19l-7-7 7-7"
+                          />
+                        </svg>
+                      </button>
+
+                      {/* Botones de páginas */}
+                      {currentPage > 3 && (
+                        <>
+                          <button
+                            onClick={() => handlePageChange(1)}
+                            className="px-4 py-2 rounded-xl border-2 border-primary-200 text-secondary-700 hover:bg-primary-50 transition-colors"
+                          >
+                            1
+                          </button>
+                          {currentPage > 4 && (
+                            <span className="px-2 text-secondary-400">...</span>
+                          )}
+                        </>
+                      )}
+
+                      {getPaginationButtons().map((pageNum) => (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-4 py-2 rounded-xl border-2 transition-colors ${
+                            pageNum === currentPage
+                              ? "btn-gradient text-white border-transparent"
+                              : "border-primary-200 text-secondary-700 hover:bg-primary-50"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      ))}
+
+                      {currentPage < totalPages - 2 && (
+                        <>
+                          {currentPage < totalPages - 3 && (
+                            <span className="px-2 text-secondary-400">...</span>
+                          )}
+                          <button
+                            onClick={() => handlePageChange(totalPages)}
+                            className="px-4 py-2 rounded-xl border-2 border-primary-200 text-secondary-700 hover:bg-primary-50 transition-colors"
+                          >
+                            {totalPages}
+                          </button>
+                        </>
+                      )}
+
+                      {/* Botón siguiente */}
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-2 rounded-xl border-2 border-primary-200 text-secondary-700 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Información de página */}
+                  <div className="text-center">
+                    <p className="text-sm text-secondary-600">
+                      {totalPages && totalPages > 1 ? (
+                        <>
+                          Página {currentPage} de {totalPages}
+                        </>
+                      ) : null}
+                      {totalVehicles !== undefined && (
+                        <>
+                          {" "}
+                          • {totalVehicles} vehículo(s){" "}
+                          {searchTerm ? `encontrado(s)` : "total"}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </>
         )}
         {/* No vehicles fallback */}{" "}
         {!isLoading && !error && vehicles && vehicles.length === 0 && (

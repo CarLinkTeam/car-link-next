@@ -1,56 +1,69 @@
-import type { Vehicle } from './vehicle'
-import type { User } from './user'
+import type { Vehicle } from "./vehicle";
+import type { User } from "./user";
 
-// Rental type definitions
+// Rental type definitions que coinciden con la respuesta de la API
 export interface Rental {
-  id: string
-  vehicleId: string
-  vehicle?: Vehicle
-  renterId: string
-  renter?: User
-  startDate: Date
-  endDate: Date
-  status: RentalStatus
-  totalPrice: number
-  paymentStatus: PaymentStatus
-  createdAt: Date
-  updatedAt?: Date
-  notes?: string
-  cancellationReason?: string
+  id: string;
+  initialDate: string; // ISO string format
+  finalDate: string; // ISO string format
+  totalCost: string; // Decimal as string
+  status: RentalStatus;
+  client: User; // Usuario completo
+  client_id: string;
+  vehicle: Vehicle; // Vehículo completo
+  vehicle_id: string;
 }
 
-export type RentalStatus = 'PENDING' | 'APPROVED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
+export type RentalStatus =
+  | "pending"
+  | "confirmed"
+  | "active"
+  | "completed"
+  | "cancelled";
 
-export type PaymentStatus = 'PENDING' | 'PAID' | 'REFUNDED' | 'PARTIAL'
+export type PaymentStatus = "PENDING" | "PAID" | "REFUNDED" | "PARTIAL";
 
 // Datos para crear una renta
-export type CreateRentalData = Pick<Rental, 'vehicleId' | 'startDate' | 'endDate' | 'notes'>
+export type CreateRentalData = {
+  vehicle_id: string;
+  initialDate: string;
+  finalDate: string;
+  totalCost: string;
+  status?: RentalStatus;
+};
 
 // Datos para actualizar una renta
-export type UpdateRentalData = Partial<Pick<Rental, 'status' | 'paymentStatus' | 'notes' | 'cancellationReason'>>
+export type UpdateRentalData = Partial<{
+  status: RentalStatus;
+  paymentStatus: PaymentStatus;
+  notes: string;
+  cancellationReason: string;
+}>;
 
-// Renta con información completa del vehículo y usuario
-export interface RentalWithDetails extends Rental {
-  vehicle: Vehicle
-  renter: User
+// Datos para crear una review
+export interface CreateReviewData {
+  rental_id: string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
 }
 
 // Filtros para búsqueda de rentas
 export interface RentalFilters {
-  status?: RentalStatus
-  paymentStatus?: PaymentStatus
-  startDate?: Date
-  endDate?: Date
-  vehicleId?: string
-  renterId?: string
+  status?: RentalStatus;
+  paymentStatus?: PaymentStatus;
+  startDate?: Date;
+  endDate?: Date;
+  vehicleId?: string;
+  renterId?: string;
 }
 
 // Estadísticas de rentas
 export interface RentalStats {
-  totalRentals: number
-  activeRentals: number
-  completedRentals: number
-  cancelledRentals: number
-  totalRevenue: number
-  averageRentalDuration: number
+  totalRentals: number;
+  activeRentals: number;
+  completedRentals: number;
+  cancelledRentals: number;
+  totalRevenue: number;
+  averageRentalDuration: number;
 }

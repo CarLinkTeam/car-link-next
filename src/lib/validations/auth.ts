@@ -19,7 +19,7 @@ export const registerSchema = z
     password: z
       .string()
       .min(6, 'La contraseña debe tener al menos 6 caracteres')
-      .max(60, 'La contraseña no puede exceder 60 caracteres')
+      .max(50, 'La contraseña no puede exceder 60 caracteres')
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/,
         'La contraseña debe contener al menos una mayúscula, una minúscula y un número'
@@ -33,6 +33,8 @@ export const registerSchema = z
     phone: z
       .string()
       .min(1, 'El teléfono es requerido')
+      .min(10, 'El teléfono debe tener al menos 10 dígitos')
+      .max(20, 'El teléfono no puede exceder 20 caracteres')
       .regex(/^\+\d{1,3}\d{6,14}$/, 'El teléfono debe incluir código de país (ej: +57 300 123 4567)'),
   })
   .refine((data) => data.password === data.confirmPassword, {
