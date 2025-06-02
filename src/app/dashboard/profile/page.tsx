@@ -1,26 +1,38 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { useMyVehicles } from '@/hooks/useMyVehicles'
+import { useMyVehicles } from '@/hooks/vehicles/useMyVehicles'
 import { usePromoteToOwner } from '@/hooks/usePromoteToOwner'
 import { useUserProfile } from '@/hooks/useUserProfile'
+import { useDeleteVehicle } from '@/hooks/vehicles/useDeleteVehicle'
 import { Button } from '@/components/ui/Button'
 import VehicleCard from '@/components/ui/VehicleCard'
 import { Alert } from '@/components/ui/Alert'
-import { EditProfileForm } from '@/components/profile/EditProfileForm'
-import { DeleteAccountModal } from '@/components/profile/DeleteAccountModal'
+import { EditProfileForm } from '@/components/ui/profile/EditProfileForm'
+import { DeleteAccountModal } from '@/components/ui/profile/DeleteAccountModal'
+import { VehicleForm } from '@/components/ui/vehicles/VehicleForm'
+import { DeleteVehicleModal } from '@/components/ui/vehicles/DeleteVehicleModal'
 import { UserRole } from '@/lib/types/entities/user'
+import { Vehicle } from '@/lib/types/entities/vehicle'
 
 const VEHICLES_PER_PAGE = 1
+
+type VehicleSectionMode = 'list' | 'create' | 'edit'
 
 export default function ProfilePage() {
   const { userProfile, isLoading: profileLoading, error: profileError, refetch: refetchProfile } = useUserProfile()
   const { vehicles, isLoading: vehiclesLoading, error: vehiclesError, refetch } = useMyVehicles()
   const { promoteToOwner, isLoading: promoteLoading, error: promoteError } = usePromoteToOwner()
+  const { deleteVehicle, isLoading: isDeleting } = useDeleteVehicle()
+
   const [showPromoteSuccess, setShowPromoteSuccess] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showDeleteVehicleModal, setShowDeleteVehicleModal] = useState(false)
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null)
+  const [vehicleSectionMode, setVehicleSectionMode] = useState<VehicleSectionMode>('list')
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
 
   const currentUser = userProfile
 
@@ -64,6 +76,43 @@ export default function ProfilePage() {
 
   const handleEditSuccess = () => {
     refetchProfile()
+  }
+
+  const handleVehicleFormSuccess = () => {
+    refetch() // Refrescar lista de vehículos
+    setVehicleSectionMode('list') // Volver a la lista
+    setEditingVehicle(null)
+  }
+
+  const handleVehicleFormCancel = () => {
+    setVehicleSectionMode('list')
+    setEditingVehicle(null)
+  }
+
+  const handleEditVehicle = (vehicle: Vehicle) => {
+    setEditingVehicle(vehicle)
+    setVehicleSectionMode('edit')
+  }
+
+  const handleDeleteVehicle = (vehicle: Vehicle) => {
+    setVehicleToDelete(vehicle)
+    setShowDeleteVehicleModal(true)
+  }
+
+  const confirmDeleteVehicle = async () => {
+    if (vehicleToDelete) {
+      const success = await deleteVehicle(vehicleToDelete.id)
+      if (success) {
+        refetch() // Refrescar lista de vehículos
+        setShowDeleteVehicleModal(false)
+        setVehicleToDelete(null)
+      }
+    }
+  }
+
+  const cancelDeleteVehicle = () => {
+    setShowDeleteVehicleModal(false)
+    setVehicleToDelete(null)
   }
 
   if (!currentUser) {
@@ -258,188 +307,253 @@ export default function ProfilePage() {
 
         {/* My Vehicles Section */}
         <div className='glass rounded-4xl p-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div className='flex items-center gap-3'>
-              <h2 className='text-2xl font-bold text-secondary-900'>Mis Vehículos</h2>
-              {vehicles.length > 0 && (
-                <span className='px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm font-medium'>
-                  {vehicles.length} {vehicles.length === 1 ? 'vehículo' : 'vehículos'}
-                </span>
-              )}
-            </div>
-            {isOwner && (
-              <Button variant='outline' size='sm'>
-                <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
-                </svg>
-                Agregar Vehículo
-              </Button>
-            )}
-          </div>
-
-          {!isOwner ? (
-            <div className='text-center py-12'>
-              <svg
-                className='w-16 h-16 text-secondary-300 mx-auto mb-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={1.5}
-                  d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
-                />
-              </svg>
-              <h3 className='text-lg font-semibold text-secondary-700 mb-2'>Acceso restringido</h3>
-              <p className='text-secondary-500 mb-4'>Necesitas ser OWNER para ver y gestionar vehículos</p>
-              {canPromoteToOwner && (
-                <p className='text-sm text-secondary-400'>
-                  Usa el botón &quot;Convertirse en OWNER&quot; para obtener acceso
-                </p>
-              )}
-            </div>
-          ) : vehiclesLoading ? (
-            <div className='text-center py-12'>
-              <div className='w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4'></div>
-              <p className='text-secondary-600'>Cargando vehículos...</p>
-            </div>
-          ) : vehiclesError ? (
-            <div className='text-center py-12'>
-              <svg
-                className='w-16 h-16 text-red-300 mx-auto mb-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={1.5}
-                  d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                />
-              </svg>
-              <h3 className='text-lg font-semibold text-red-700 mb-2'>Error al cargar vehículos</h3>
-              <p className='text-red-600 mb-4'>{vehiclesError}</p>
-              <Button variant='outline' onClick={refetch}>
-                Reintentar
-              </Button>
-            </div>
-          ) : vehicles.length === 0 ? (
-            <div className='text-center py-12'>
-              <svg
-                className='w-16 h-16 text-secondary-300 mx-auto mb-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={1.5}
-                  d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-6m-4 0H3m2-16h14a2 2 0 012 2v14a2 2 0 01-2 2M7 7h10m-10 4h10m-10 4h7'
-                />
-              </svg>
-              <h3 className='text-lg font-semibold text-secondary-700 mb-2'>No tienes vehículos</h3>
-              <p className='text-secondary-500 mb-4'>
-                Comienza agregando tu primer vehículo para comenzar a generar ingresos
-              </p>
-              <Button variant='primary' className='btn-gradient'>
-                <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
-                </svg>
-                Agregar mi primer vehículo
-              </Button>
-            </div>
-          ) : (
-            <div className='space-y-6'>
-              {/* Vehicles List */}
-              <div className='space-y-4'>
-                {currentVehicles.map((vehicle) => (
-                  <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                ))}
+          {/* Header con modo dinámico */}
+          {vehicleSectionMode === 'list' && (
+            <div className='flex items-center justify-between mb-6'>
+              <div className='flex items-center gap-3'>
+                <h2 className='text-2xl font-bold text-secondary-900'>Mis Vehículos</h2>
+                {vehicles.length > 0 && (
+                  <span className='px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm font-medium'>
+                    {vehicles.length} {vehicles.length === 1 ? 'vehículo' : 'vehículos'}
+                  </span>
+                )}
               </div>
+              {isOwner && (
+                <Button variant='outline' size='sm' onClick={() => setVehicleSectionMode('create')}>
+                  <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
+                  </svg>
+                  Agregar Vehículo
+                </Button>
+              )}
+            </div>
+          )}
 
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className='flex flex-col items-center space-y-4'>
-                  {/* Page Info */}
-                  <div className='text-sm text-secondary-600'>
-                    Mostrando {startIndex + 1}-{Math.min(endIndex, vehicles.length)} de {vehicles.length} vehículos
-                  </div>
+          {/* Renderizado dinámico según el modo */}
+          {vehicleSectionMode === 'create' && (
+            <VehicleForm mode='create' onSuccess={handleVehicleFormSuccess} onCancel={handleVehicleFormCancel} />
+          )}
 
-                  {/* Navigation Controls */}
-                  <div className='flex items-center justify-center space-x-2'>
-                    {/* Previous Button */}
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={handlePrevPage}
-                      disabled={currentPage === 1}
-                      className='px-3 py-2 pagination-button'
-                    >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
-                      </svg>
-                    </Button>
+          {vehicleSectionMode === 'edit' && editingVehicle && (
+            <VehicleForm
+              mode='edit'
+              vehicle={editingVehicle}
+              onSuccess={handleVehicleFormSuccess}
+              onCancel={handleVehicleFormCancel}
+            />
+          )}
 
-                    {/* Page Numbers */}
-                    <div className='flex space-x-1'>
-                      {Array.from({ length: totalPages }, (_, index) => {
-                        const page = index + 1
-                        const isCurrentPage = page === currentPage
+          {vehicleSectionMode === 'list' && (
+            <>
+              {!isOwner ? (
+                <div className='text-center py-12'>
+                  <svg
+                    className='w-16 h-16 text-secondary-300 mx-auto mb-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={1.5}
+                      d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+                    />
+                  </svg>
+                  <h3 className='text-lg font-semibold text-secondary-700 mb-2'>Acceso restringido</h3>
+                  <p className='text-secondary-500 mb-4'>Necesitas ser OWNER para ver y gestionar vehículos</p>
+                  {canPromoteToOwner && (
+                    <p className='text-sm text-secondary-400'>
+                      Usa el botón &quot;Convertirse en OWNER&quot; para obtener acceso
+                    </p>
+                  )}
+                </div>
+              ) : vehiclesLoading ? (
+                <div className='text-center py-12'>
+                  <div className='w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4'></div>
+                  <p className='text-secondary-600'>Cargando vehículos...</p>
+                </div>
+              ) : vehiclesError ? (
+                <div className='text-center py-12'>
+                  <svg
+                    className='w-16 h-16 text-red-300 mx-auto mb-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={1.5}
+                      d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                    />
+                  </svg>
+                  <h3 className='text-lg font-semibold text-red-700 mb-2'>Error al cargar vehículos</h3>
+                  <p className='text-red-600 mb-4'>{vehiclesError}</p>
+                  <Button variant='outline' onClick={refetch}>
+                    Reintentar
+                  </Button>
+                </div>
+              ) : vehicles.length === 0 ? (
+                <div className='text-center py-12'>
+                  <svg
+                    className='w-16 h-16 text-secondary-300 mx-auto mb-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={1.5}
+                      d='M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-6m-4 0H3m2-16h14a2 2 0 012 2v14a2 2 0 01-2 2M7 7h10m-10 4h10m-10 4h7'
+                    />
+                  </svg>
+                  <h3 className='text-lg font-semibold text-secondary-700 mb-2'>No tienes vehículos</h3>
+                  <p className='text-secondary-500 mb-4'>
+                    Comienza agregando tu primer vehículo para comenzar a generar ingresos
+                  </p>
+                  <Button variant='primary' className='btn-gradient' onClick={() => setVehicleSectionMode('create')}>
+                    <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M12 6v6m0 0v6m0-6h6m-6 0H6'
+                      />
+                    </svg>
+                    Agregar mi primer vehículo
+                  </Button>
+                </div>
+              ) : (
+                <div className='space-y-6'>
+                  {/* Vehicles List con botones de acción */}
+                  <div className='space-y-4'>
+                    {currentVehicles.map((vehicle) => (
+                      <div key={vehicle.id} className='relative'>
+                        <VehicleCard vehicle={vehicle} />
 
-                        return (
-                          <button
-                            key={page}
-                            onClick={() => handlePageChange(page)}
-                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 pagination-button ${
-                              isCurrentPage
-                                ? 'btn-gradient text-white shadow-lg pagination-active'
-                                : 'glass text-secondary-700 hover:bg-primary-50 hover:text-primary-700'
-                            }`}
+                        {/* Botones de acción */}
+                        <div className='absolute top-4 right-4 flex gap-2'>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={() => handleEditVehicle(vehicle)}
+                            disabled={isDeleting}
+                            className='bg-white/90 backdrop-blur-sm'
                           >
-                            {page}
-                          </button>
-                        )
-                      })}
-                    </div>
+                            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                              <path
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
+                                strokeWidth={2}
+                                d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                              />
+                            </svg>
+                            Editar
+                          </Button>
 
-                    {/* Next Button */}
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                      className='px-3 py-2 pagination-button'
-                    >
-                      <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-                      </svg>
-                    </Button>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={() => handleDeleteVehicle(vehicle)}
+                            disabled={isDeleting}
+                            className='bg-white/90 backdrop-blur-sm border-red-300 text-red-600 hover:bg-red-50'
+                          >
+                            {isDeleting ? (
+                              <div className='w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin' />
+                            ) : (
+                              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                                <path
+                                  strokeLinecap='round'
+                                  strokeLinejoin='round'
+                                  strokeWidth={2}
+                                  d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
+                                />
+                              </svg>
+                            )}
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
-                  {/* Quick Navigation for Many Pages */}
-                  {totalPages > 5 && (
-                    <div className='flex items-center space-x-2 text-sm text-secondary-600'>
-                      <span>Ir a página:</span>
-                      <select
-                        value={currentPage}
-                        onChange={(e) => handlePageChange(Number(e.target.value))}
-                        className='glass rounded-lg px-2 py-1 text-secondary-900 border border-secondary-200 focus:border-primary-400 focus:outline-none'
-                      >
-                        {Array.from({ length: totalPages }, (_, index) => (
-                          <option key={index + 1} value={index + 1}>
-                            {index + 1}
-                          </option>
-                        ))}
-                      </select>
+                  {/* Pagination Controls - mismo código existente */}
+                  {totalPages > 1 && (
+                    <div className='flex flex-col items-center space-y-4'>
+                      <div className='text-sm text-secondary-600'>
+                        Mostrando {startIndex + 1}-{Math.min(endIndex, vehicles.length)} de {vehicles.length} vehículos
+                      </div>
+
+                      <div className='flex items-center justify-center space-x-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          onClick={handlePrevPage}
+                          disabled={currentPage === 1}
+                          className='px-3 py-2 pagination-button'
+                        >
+                          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
+                          </svg>
+                        </Button>
+
+                        <div className='flex space-x-1'>
+                          {Array.from({ length: totalPages }, (_, index) => {
+                            const page = index + 1
+                            const isCurrentPage = page === currentPage
+
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 pagination-button ${
+                                  isCurrentPage
+                                    ? 'btn-gradient text-white shadow-lg pagination-active'
+                                    : 'glass text-secondary-700 hover:bg-primary-50 hover:text-primary-700'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages}
+                          className='px-3 py-2 pagination-button'
+                        >
+                          <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                          </svg>
+                        </Button>
+                      </div>
+
+                      {totalPages > 5 && (
+                        <div className='flex items-center space-x-2 text-sm text-secondary-600'>
+                          <span>Ir a página:</span>
+                          <select
+                            value={currentPage}
+                            onChange={(e) => handlePageChange(Number(e.target.value))}
+                            className='glass rounded-lg px-2 py-1 text-secondary-900 border border-secondary-200 focus:border-primary-400 focus:outline-none'
+                          >
+                            {Array.from({ length: totalPages }, (_, index) => (
+                              <option key={index + 1} value={index + 1}>
+                                {index + 1}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -457,6 +571,13 @@ export default function ProfilePage() {
             isOpen={showDeleteModal}
             onClose={() => setShowDeleteModal(false)}
             userEmail={currentUser.email}
+          />
+          <DeleteVehicleModal
+            isOpen={showDeleteVehicleModal}
+            vehicle={vehicleToDelete}
+            onConfirm={confirmDeleteVehicle}
+            onCancel={cancelDeleteVehicle}
+            isDeleting={isDeleting}
           />
         </>
       )}
