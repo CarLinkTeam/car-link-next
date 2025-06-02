@@ -65,6 +65,18 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       }
     }
 
+    const requiredRoles = RouteUtils.getRequiredRoles(pathname)
+    if (requiredRoles.length > 0) {
+      const userRoles = user?.roles ?? []
+      const hasRequiredRole = requiredRoles.some((role) => userRoles.includes(role))
+
+      if (!hasRequiredRole) {
+        console.warn('AuthGuard: Usuario autenticado sin rol requerido, redirigiendo a access-denied')
+        router.replace(`${AUTH_ROUTES_CONFIG.DEFAULTS.ACCESS_DENIED}?reason=insufficient-role`)
+        return
+      }
+    }
+
     // Si llegamos aquí, la verificación está completa
     setIsVerifying(false)
   }, [_hasHydrated, isAuthenticated, token, user, pathname, router])
@@ -90,8 +102,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
               {!_hasHydrated
                 ? 'Preparando tu experiencia de renta...'
                 : isProtectedRoute
-                ? 'Verificando permisos de acceso...'
-                : 'Cargando página...'}
+                  ? 'Verificando permisos de acceso...'
+                  : 'Cargando página...'}
             </p>
           </div>
 

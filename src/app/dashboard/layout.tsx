@@ -3,7 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth-store";
-import { getInitials } from "@/lib/utils/utils";
+import { getInitials, hasRole } from "@/lib/utils/utils";
+import { User } from "@/lib/types";
 
 export default function DashboardLayout({
   children,
@@ -108,7 +109,7 @@ export default function DashboardLayout({
                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-6m-4 0H3m2-16h14a2 2 0 012 2v14a2 2 0 01-2 2M7 7h10m-10 4h10m-10 4h7"
                         />
                       </svg>
-                      Mis vehículos
+                      Explorar vehículos
                     </Link>
                     <Link
                       href="/dashboard/rentals"
@@ -135,7 +136,7 @@ export default function DashboardLayout({
                       </svg>
                       Mis rentas
                     </Link>
-                    <Link
+                    {hasRole(user as User, "OWNER") && (<Link
                       href="/dashboard/requests"
                       className="flex items-center gap-3 px-3 py-2 text-sm text-secondary-700 hover:bg-white/50 rounded-lg transition-colors floating-card"
                     >
@@ -158,10 +159,10 @@ export default function DashboardLayout({
                           d="M15 5v6l6 6V7a2 2 0 00-2-2h-4z"
                         />
                       </svg>
-                      Mis solicitudes
-                    </Link>
-                    <Link
-                      href="/dashboard/settings"
+                      Solicitudes (Mis autos)
+                    </Link>)}
+                    {hasRole(user as User, "ADMIN") && (<Link
+                      href="/dashboard/admin"
                       className="flex items-center gap-3 px-3 py-2 text-sm text-secondary-700 hover:bg-white/50 rounded-lg transition-colors floating-card"
                     >
                       <svg
@@ -183,8 +184,8 @@ export default function DashboardLayout({
                           d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
-                      Configuración
-                    </Link>
+                      Panel de administración
+                    </Link>)}
                     <div className="border-t border-secondary-100 my-1"></div>
                     <button
                       onClick={logout}
