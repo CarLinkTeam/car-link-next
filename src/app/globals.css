@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Variables CSS personalizadas para CarLink */
 :root {
@@ -103,8 +103,7 @@
   --shadow-glow: 0 0 15px rgba(239, 68, 68, 0.3);
   --shadow-glow-lg: 0 0 25px rgba(239, 68, 68, 0.4);
   --shadow-red-glow: 0 0 20px rgba(220, 38, 38, 0.5);
-  --shadow-inner-lg: inset 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    inset 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-inner-lg: inset 0 10px 15px -3px rgba(0, 0, 0, 0.1), inset 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Keyframes para animaciones */
@@ -223,12 +222,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(
-    135deg,
-    #dc2626 0%,
-    #ef4444 50%,
-    #f97316 100%
-  ) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -242,12 +236,7 @@ body {
 }
 
 .btn-gradient {
-  background: linear-gradient(
-    135deg,
-    #dc2626 0%,
-    #ef4444 50%,
-    #f97316 100%
-  ) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%) !important;
   border: none !important;
   color: white !important;
   transition: all 0.2s ease !important;
@@ -255,23 +244,13 @@ body {
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(
-    135deg,
-    #b91c1c 0%,
-    #dc2626 50%,
-    #ea580c 100%
-  ) !important;
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ea580c 100%) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 10px 30px rgba(220, 38, 38, 0.5) !important;
 }
 
 .btn-gradient-orange {
-  background: linear-gradient(
-    135deg,
-    #f97316 0%,
-    #ea580c 50%,
-    #c2410c 100%
-  ) !important;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%) !important;
   border: none !important;
   color: white !important;
   transition: all 0.2s ease !important;
@@ -279,12 +258,7 @@ body {
 }
 
 .btn-gradient-orange:hover {
-  background: linear-gradient(
-    135deg,
-    #ea580c 0%,
-    #c2410c 50%,
-    #9a3412 100%
-  ) !important;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%) !important;
   transform: translateY(-2px) !important;
   box-shadow: 0 10px 30px rgba(249, 115, 22, 0.5) !important;
 }
@@ -308,21 +282,9 @@ body {
 }
 
 .auth-pattern {
-  background-image: radial-gradient(
-      circle at 20% 80%,
-      rgba(220, 38, 38, 0.08) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(249, 115, 22, 0.08) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 40% 40%,
-      rgba(239, 68, 68, 0.05) 0%,
-      transparent 60%
-    ) !important;
+  background-image: radial-gradient(circle at 20% 80%, rgba(220, 38, 38, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 40% 40%, rgba(239, 68, 68, 0.05) 0%, transparent 60%) !important;
   background-size: 500px 500px, 300px 300px, 700px 700px !important;
   background-color: #ffffff !important;
 }
@@ -431,4 +393,45 @@ select:focus {
 
 .shadow-inner-lg {
   box-shadow: var(--shadow-inner-lg) !important;
+}
+
+/* Estilos de paginación personalizados */
+.pagination-button {
+  transition: all 0.2s ease !important;
+  border: 1px solid rgba(209, 213, 219, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.pagination-button:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.pagination-active {
+  animation: glow 2s ease-in-out infinite alternate !important;
+}
+
+.vehicle-card-compact {
+  transform: scale(0.95) !important;
+  transition: all 0.3s ease !important;
+}
+
+.vehicle-card-compact:hover {
+  transform: scale(1) !important;
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2) !important;
+}
+
+select.glass {
+  appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E") !important;
+  background-position: right 8px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 16px !important;
+  padding-right: 32px !important;
 }

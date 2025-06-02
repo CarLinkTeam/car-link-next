@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { LoginFormData, RegisterFormData } from '@/lib/validations/auth'
-import { User } from '@/lib/types'
+import { User, AuthUser } from '@/lib/types'
 import { auth } from '@/lib/api'
 
 interface AuthState {
@@ -16,6 +16,7 @@ interface AuthState {
   login: (data: LoginFormData) => Promise<void>
   register: (data: Omit<RegisterFormData, 'confirmPassword'>) => Promise<void>
   logout: () => void
+  updateUser: (userData: AuthUser) => void
   clearError: () => void
   setLoading: (loading: boolean) => void
   setHasHydrated: (state: boolean) => void
@@ -90,6 +91,15 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
           error: null,
         })
+      },
+
+      /**
+       * Actualiza los datos del usuario (para promociones de rol, etc.)
+       */
+      updateUser: (userData) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...userData } : null,
+        }))
       },
 
       /**
