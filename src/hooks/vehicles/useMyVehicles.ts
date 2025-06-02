@@ -37,13 +37,20 @@ export const useMyVehicles = (): UseMyVehiclesReturn => {
       setVehicles(data)
     } catch (err) {
       const axiosError = err as AxiosError
-      if (axiosError.response?.status === 404) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al cargar vehículos'
+
+      // Manejar caso específico cuando un owner no tiene vehículos (esto es normal, no un error)
+      if (
+        axiosError.response?.status === 404 ||
+        errorMessage.includes('not found') ||
+        errorMessage.includes('Vehicles for owner') ||
+        errorMessage.includes('El recurso solicitado no existe')
+      ) {
         setVehicles([])
         setError(null)
         return
       }
-
-      const errorMessage = err instanceof Error ? err.message : 'Error al cargar vehículos'
+      
       setError(errorMessage)
       setVehicles([])
     } finally {

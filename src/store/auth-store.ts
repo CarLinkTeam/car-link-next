@@ -86,6 +86,7 @@ export const useAuthStore = create<AuthState>()(
             token,
             isAuthenticated: true,
             isLoading: false,
+            error: null,
           });
         } catch (error) {
           const message =
@@ -94,8 +95,9 @@ export const useAuthStore = create<AuthState>()(
             error: message,
             isLoading: false,
             isAuthenticated: false,
+            user: null,
+            token: null,
           });
-          throw error;
         }
       },
 
@@ -111,6 +113,7 @@ export const useAuthStore = create<AuthState>()(
             token,
             isAuthenticated: true,
             isLoading: false,
+            error: null,
           });
         } catch (error) {
           const message =
@@ -119,8 +122,9 @@ export const useAuthStore = create<AuthState>()(
             error: message,
             isLoading: false,
             isAuthenticated: false,
+            user: null,
+            token: null,
           });
-          throw error;
         }
       },
 
