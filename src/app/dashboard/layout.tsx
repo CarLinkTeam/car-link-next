@@ -136,6 +136,31 @@ export default function DashboardLayout({
                       Mis rentas
                     </Link>
                     <Link
+                      href="/dashboard/requests"
+                      className="flex items-center gap-3 px-3 py-2 text-sm text-secondary-700 hover:bg-white/50 rounded-lg transition-colors floating-card"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2H9z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 5v6l6 6V7a2 2 0 00-2-2h-4z"
+                        />
+                      </svg>
+                      Mis solicitudes
+                    </Link>
+                    <Link
                       href="/dashboard/settings"
                       className="flex items-center gap-3 px-3 py-2 text-sm text-secondary-700 hover:bg-white/50 rounded-lg transition-colors floating-card"
                     >
