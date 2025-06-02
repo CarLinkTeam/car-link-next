@@ -36,26 +36,30 @@ export const useUserRentalsStore = create<UserRentalsState>()(
       lastFetched: null,
 
       fetchRentals: async () => {
-        const { lastFetched } = get();
+        const { lastFetched, rentals } = get();
         const now = Date.now();
 
-        // Cache por 5 minutos
-        if (lastFetched && now - lastFetched < 5 * 60 * 1000) {
+        // Si ya tenemos rentas y están en cache (menos de 5 minutos), no recargar
+        if (
+          lastFetched &&
+          rentals.length > 0 &&
+          now - lastFetched < 5 * 60 * 1000
+        ) {
           return;
         }
 
         set({ isLoading: true, error: null });
 
         try {
-          const rentals = await RentalService.getUserRentals();
+          const fetchedRentals = await RentalService.getUserRentals();
           set({
-            rentals,
+            rentals: fetchedRentals,
             isLoading: false,
             lastFetched: now,
           });
 
           // Verificar reviews para rentas completadas
-          const completedRentals = rentals.filter(
+          const completedRentals = fetchedRentals.filter(
             (r) => r.status === "completed"
           );
           if (completedRentals.length > 0) {
@@ -172,6 +176,7 @@ export const useUserRentalsStore = create<UserRentalsState>()(
       name: "user-rentals-store",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        rentals: state.rentals,
         rentalReviews: state.rentalReviews,
         lastFetched: state.lastFetched,
       }),

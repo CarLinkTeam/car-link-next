@@ -30,10 +30,16 @@ export default function RentalsPage() {
   const [filterStatus, setFilterStatus] = useState<RentalStatus | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Cargar rentas al montar el componente
   useEffect(() => {
-    fetchRentals();
+    const loadRentals = async () => {
+      await fetchRentals();
+      setIsInitialLoad(false);
+    };
+
+    loadRentals();
   }, [fetchRentals]);
 
   // Filtrar rentas
@@ -79,7 +85,10 @@ export default function RentalsPage() {
     clearReviewError();
   };
 
-  if (isLoading && rentals.length === 0) {
+  // Mostrar loading solo en la carga inicial cuando no hay rentas
+  const shouldShowLoading = isInitialLoad && rentals.length === 0;
+
+  if (shouldShowLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -97,7 +106,14 @@ export default function RentalsPage() {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-400 to-accent-500 rounded-2xl mb-4">
           <FaHistory className="text-white text-2xl" />
         </div>
-        <h1 className="text-4xl font-bold gradient-text mb-4">Mis Rentas</h1>
+        <h1 className="text-4xl font-bold gradient-text mb-4">
+          Mis Rentas
+          {isLoading && rentals.length > 0 && (
+            <span className="ml-2 inline-block">
+              <div className="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full"></div>
+            </span>
+          )}
+        </h1>
         <p className="text-secondary-600 max-w-2xl mx-auto">
           Gestiona todas tus rentas y deja reseñas sobre tu experiencia
         </p>
