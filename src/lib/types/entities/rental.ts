@@ -67,3 +67,11 @@ export interface RentalStats {
   totalRevenue: number;
   averageRentalDuration: number;
 }
+
+export const rentalStatusLabels: Record<string, string> = {
+  "PENDING": 'Pendiente',
+  "APPROVED": 'Aprobada',
+  "ACTIVE": 'Activa',
+  "COMPLETED": 'Completada',
+  "CANCELLED": 'Cancelada',
+};
