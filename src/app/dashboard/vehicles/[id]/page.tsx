@@ -103,7 +103,7 @@ export default function VehicleDetailsPage() {
     if (!vehicle) {
       return 0;
     }
-    return parseFloat(vehicle.daily_price) * calculateDays();
+    return parseFloat(vehicle.daily_price.toString()) * calculateDays();
   };
 
   const handleRental = async () => {
@@ -372,7 +372,7 @@ export default function VehicleDetailsPage() {
               {/* Price */}
               <div className="text-center bg-gradient-to-r from-primary-50 to-accent-50 rounded-3xl p-6 mb-6">
                 <p className="text-4xl font-bold gradient-text mb-2">
-                  {formatPrice(vehicle.daily_price)}
+                  {formatPrice(vehicle.daily_price.toString())}
                 </p>
                 <p className="text-lg text-secondary-600 font-medium">
                   por día
@@ -634,7 +634,7 @@ export default function VehicleDetailsPage() {
                       Miembro desde
                     </p>
                     <p className="font-bold text-lg text-secondary-800">
-                      {formatDate(vehicle.createdAt)}
+                      {formatDate(vehicle.created_at)}
                     </p>
                   </div>
                 </div>

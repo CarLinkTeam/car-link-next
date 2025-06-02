@@ -36,25 +36,27 @@ export default function RegisterPage() {
     },
   })
 
-  // Limpiar errores cuando el usuario escriba
+  // Limpiar errores solo cuando el usuario cambie el email después de un error de email duplicado
   const watchedFields = watch()
   useEffect(() => {
-    if (error) {
-      clearError()
+    if (error && watchedFields.email) {
+      // Solo limpiar si hay contenido en email y hubo un error previo
+      const isEmailDuplicateError = error.toLowerCase().includes('email') && error.toLowerCase().includes('registrado')
+      const timer = setTimeout(() => {
+        clearError()
+      }, isEmailDuplicateError ? 5000 : 2000) // 5s para email duplicado, 2s para otros errores
+
+      return () => clearTimeout(timer)
     }
-  }, [watchedFields, error, clearError])
+  }, [watchedFields.email, error, clearError])
 
   const onSubmit = async (data: RegisterFormData) => {
-    try {
-      // Extraer confirmPassword ya que no se envía al server
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { confirmPassword, ...registerData } = data
-      await registerUser(registerData)
-      // AuthGuard se encarga automáticamente de la redirección
-    } catch (err) {
-      // El error se maneja en el store
-      console.error('Register error:', err)
-    }
+    clearError() // Limpiar errores previos al enviar
+    // Extraer confirmPassword ya que no se envía al server
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword, ...registerData } = data
+    await registerUser(registerData)
+    // AuthGuard se encarga automáticamente de la redirección si es exitoso
   }
 
   const isFormComplete = isValid
@@ -80,7 +82,15 @@ export default function RegisterPage() {
       {/* Error Alert */}
       {error && (
         <div className='mb-4 animate-fade-in'>
-          <Alert type='error' message={error} onClose={clearError} />
+          <Alert 
+            type='error' 
+            title={error.toLowerCase().includes('email') && error.toLowerCase().includes('registrado') 
+              ? 'Email ya registrado' 
+              : 'Error en el registro'
+            }
+            message={error} 
+            onClose={clearError} 
+          />
         </div>
       )}
 

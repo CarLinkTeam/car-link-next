@@ -126,7 +126,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           {/* Price */}
           <div className="mb-4 text-center">
             <p className="text-3xl font-bold gradient-text">
-              {formatPrice(vehicle.daily_price)}
+              {formatPrice(vehicle.daily_price.toString())}
             </p>
             <p className="text-sm text-secondary-500 font-medium mb-4">
               por día
