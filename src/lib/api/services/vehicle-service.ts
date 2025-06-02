@@ -31,6 +31,7 @@ export const VehicleService = {
     page?: number;
     limit?: number;
     make?: string;
+    vehicleModel?: string;
     class?: string;
     minPrice?: number;
     maxPrice?: number;
@@ -40,6 +41,8 @@ export const VehicleService = {
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.make) queryParams.append("make", params.make);
+    if (params?.vehicleModel)
+      queryParams.append("vehicleModel", params.vehicleModel);
     if (params?.class) queryParams.append("class", params.class);
     if (params?.minPrice)
       queryParams.append("minPrice", params.minPrice.toString());
