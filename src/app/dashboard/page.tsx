@@ -61,6 +61,10 @@ export default function DashboardPage() {
             <h3 className="font-semibold text-lg mb-2 text-secondary-700">Your Profile</h3>
             <p className="text-secondary-600">Update your profile information</p>
           </div>
+          <div className="bg-white p-4 rounded-lg shadow border border-secondary-200">
+            <h3 className="font-semibold text-lg mb-2 text-secondary-700">Admin</h3>
+            <p className="text-secondary-600">Manage web app</p>
+          </div>
         </div>
       </div>
     </div>
