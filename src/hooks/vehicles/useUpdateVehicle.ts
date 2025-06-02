@@ -1,13 +1,12 @@
 import { useState } from 'react'
+import { EditVehicleFormData } from '@/lib/validations/vehicle'
 import { VehicleService } from '@/lib/api/services/vehicle-service'
-import { UpdateVehicleDto } from '@/lib/types/entities/vehicle'
-import { Vehicle } from '@/lib/types/entities/vehicle'
 
 interface UseUpdateVehicleReturn {
+  updateVehicle: (id: string, data: EditVehicleFormData) => Promise<boolean>
   isLoading: boolean
   error: string | null
   success: boolean
-  updateVehicle: (id: string, data: UpdateVehicleDto) => Promise<Vehicle | null>
   clearMessages: () => void
 }
 
@@ -16,21 +15,20 @@ export const useUpdateVehicle = (): UseUpdateVehicleReturn => {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  const updateVehicle = async (id: string, data: UpdateVehicleDto): Promise<Vehicle | null> => {
+  const updateVehicle = async (id: string, data: EditVehicleFormData): Promise<boolean> => {
     try {
       setIsLoading(true)
       setError(null)
       setSuccess(false)
 
-      const vehicle = await VehicleService.update(id, data)
-      setSuccess(true)
+      await VehicleService.update(id, data)
 
-      return vehicle
+      setSuccess(true)
+      return true
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar el vehículo'
+      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar vehículo'
       setError(errorMessage)
-      console.error('Error updating vehicle:', err)
-      return null
+      return false
     } finally {
       setIsLoading(false)
     }
@@ -42,10 +40,10 @@ export const useUpdateVehicle = (): UseUpdateVehicleReturn => {
   }
 
   return {
+    updateVehicle,
     isLoading,
     error,
     success,
-    updateVehicle,
     clearMessages,
   }
 }

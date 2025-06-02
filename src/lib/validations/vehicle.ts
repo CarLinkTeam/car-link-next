@@ -31,8 +31,7 @@ export const createVehicleSchema = z.object({
     .regex(/^[A-Z0-9-]+$/, 'La placa solo puede contener letras mayúsculas, números y guiones'),
   daily_price: z
     .number()
-    .min(1, 'El precio diario debe ser mayor a 0')
-    .max(10000, 'El precio diario no puede exceder $10,000'),
+    .min(1, 'El precio diario debe ser mayor a 0'),
   rental_conditions: z
     .string()
     .min(1, 'Las condiciones de renta son requeridas')
@@ -47,22 +46,22 @@ export const createVehicleSchema = z.object({
 export const editVehicleSchema = createVehicleSchema.extend({
   class: z
     .string()
-    .min(2, 'La clase debe tener al menos 2 caracteres')
+    .min(1, 'La clase debe tener al menos 1 caracteres')
     .max(30, 'La clase no puede exceder 30 caracteres')
     .optional(),
   drive: z
     .string()
-    .min(2, 'El tipo de tracción debe tener al menos 2 caracteres')
+    .min(1, 'El tipo de tracción debe tener al menos 1 caracteres')
     .max(20, 'El tipo de tracción no puede exceder 20 caracteres')
     .optional(),
   fuel_type: z
     .string()
-    .min(2, 'El tipo de combustible debe tener al menos 2 caracteres')
+    .min(1, 'El tipo de combustible debe tener al menos 1 caracteres')
     .max(20, 'El tipo de combustible no puede exceder 20 caracteres')
     .optional(),
   transmission: z
     .string()
-    .min(2, 'El tipo de transmisión debe tener al menos 2 caracteres')
+    .min(1, 'El tipo de transmisión debe tener al menos 1 caracteres')
     .max(20, 'El tipo de transmisión no puede exceder 20 caracteres')
     .optional(),
 })

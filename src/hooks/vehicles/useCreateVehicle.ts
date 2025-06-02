@@ -29,7 +29,6 @@ export const useCreateVehicle = (): UseCreateVehicleReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al crear el vehículo'
       setError(errorMessage)
-      console.error('Error creating vehicle:', err)
       return null
     } finally {
       setIsLoading(false)
