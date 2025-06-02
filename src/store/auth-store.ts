@@ -1,26 +1,68 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import { LoginFormData, RegisterFormData } from '@/lib/validations/auth'
-import { User, AuthUser } from '@/lib/types'
-import { auth } from '@/lib/api'
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { LoginFormData, RegisterFormData } from "@/lib/validations/auth";
+import { User, AuthUser, UserRole } from "@/lib/types";
+import { auth } from "@/lib/api";
 
 interface AuthState {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  error: string | null
-  _hasHydrated: boolean
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  _hasHydrated: boolean;
 
   // Actions
-  login: (data: LoginFormData) => Promise<void>
-  register: (data: Omit<RegisterFormData, 'confirmPassword'>) => Promise<void>
-  logout: () => void
-  updateUser: (userData: AuthUser) => void
-  clearError: () => void
-  setLoading: (loading: boolean) => void
-  setHasHydrated: (state: boolean) => void
+  login: (data: LoginFormData) => Promise<void>;
+  register: (data: Omit<RegisterFormData, "confirmPassword">) => Promise<void>;
+  logout: () => void;
+  updateUser: (userData: AuthUser) => void;
+  clearError: () => void;
+  setLoading: (loading: boolean) => void;
+  setHasHydrated: (state: boolean) => void;
 }
+
+// Selectores optimizados
+export const authSelectors = {
+  // Selecciona solo si el usuario está autenticado
+  isAuthenticated: (state: AuthState) => state.isAuthenticated,
+
+  // Selecciona solo el usuario
+  user: (state: AuthState) => state.user,
+
+  // Selecciona solo los roles del usuario
+  userRoles: (state: AuthState) => state.user?.roles || [],
+
+  // Selecciona si el usuario tiene un rol específico
+  hasRole: (role: UserRole) => (state: AuthState) =>
+    state.user?.roles?.includes(role) || false,
+
+  // Selecciona si el usuario es owner
+  isOwner: (state: AuthState) => state.user?.roles?.includes("OWNER") || false,
+
+  // Selecciona si el usuario es admin
+  isAdmin: (state: AuthState) => state.user?.roles?.includes("ADMIN") || false,
+
+  // Selecciona el estado de loading
+  isLoading: (state: AuthState) => state.isLoading,
+
+  // Selecciona el error
+  error: (state: AuthState) => state.error,
+
+  // Selecciona si la app ha hidratado
+  hasHydrated: (state: AuthState) => state._hasHydrated,
+
+  // Selecciona información básica del usuario
+  userInfo: (state: AuthState) =>
+    state.user
+      ? {
+          id: state.user.id,
+          fullName: state.user.fullName,
+          email: state.user.email,
+          roles: state.user.roles,
+        }
+      : null,
+};
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -36,23 +78,24 @@ export const useAuthStore = create<AuthState>()(
        * Maneja el proceso de login
        */
       login: async (data) => {
-        set({ isLoading: true, error: null })
+        set({ isLoading: true, error: null });
         try {
-          const { user, token } = await auth.login(data)
+          const { user, token } = await auth.login(data);
           set({
             user,
             token,
             isAuthenticated: true,
             isLoading: false,
-          })
+          });
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'Error desconocido'
+          const message =
+            error instanceof Error ? error.message : "Error desconocido";
           set({
             error: message,
             isLoading: false,
             isAuthenticated: false,
-          })
-          throw error
+          });
+          throw error;
         }
       },
 
@@ -60,23 +103,24 @@ export const useAuthStore = create<AuthState>()(
        * Maneja el proceso de registro
        */
       register: async (data) => {
-        set({ isLoading: true, error: null })
+        set({ isLoading: true, error: null });
         try {
-          const { user, token } = await auth.register(data)
+          const { user, token } = await auth.register(data);
           set({
             user,
             token,
             isAuthenticated: true,
             isLoading: false,
-          })
+          });
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'Error desconocido'
+          const message =
+            error instanceof Error ? error.message : "Error desconocido";
           set({
             error: message,
             isLoading: false,
             isAuthenticated: false,
-          })
-          throw error
+          });
+          throw error;
         }
       },
 
@@ -90,7 +134,14 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           isLoading: false,
           error: null,
-        })
+        });
+
+        // Limpiar otros stores relacionados
+        if (typeof window !== "undefined") {
+          // Limpiar localStorage de otros stores
+          localStorage.removeItem("user-rentals-store");
+          localStorage.removeItem("vehicle-details-store");
+        }
       },
 
       /**
@@ -99,32 +150,32 @@ export const useAuthStore = create<AuthState>()(
       updateUser: (userData) => {
         set((state) => ({
           user: state.user ? { ...state.user, ...userData } : null,
-        }))
+        }));
       },
 
       /**
        * Limpia los errores del store
        */
       clearError: () => {
-        set({ error: null })
+        set({ error: null });
       },
 
       /**
        * Establece el estado de loading
        */
       setLoading: (loading) => {
-        set({ isLoading: loading })
+        set({ isLoading: loading });
       },
 
       /**
        * Establece el estado de hidratación
        */
       setHasHydrated: (state) => {
-        set({ _hasHydrated: state })
+        set({ _hasHydrated: state });
       },
     }),
     {
-      name: 'auth-store',
+      name: "auth-store",
       storage: createJSONStorage(() => localStorage),
       // Incluir isAuthenticated en la persistencia y agregar hidratación
       partialize: (state) => ({
@@ -136,11 +187,23 @@ export const useAuthStore = create<AuthState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           // Si hay token y user, el usuario está autenticado
-          const isAuth = !!(state.token && state.user)
-          state.isAuthenticated = isAuth
-          state._hasHydrated = true
+          const isAuth = !!(state.token && state.user);
+          state.isAuthenticated = isAuth;
+          state._hasHydrated = true;
         }
       },
     }
   )
-)
+);
+
+// Hooks personalizados para selectores comunes
+export const useIsAuthenticated = () =>
+  useAuthStore(authSelectors.isAuthenticated);
+export const useUser = () => useAuthStore(authSelectors.user);
+export const useUserRoles = () => useAuthStore(authSelectors.userRoles);
+export const useIsOwner = () => useAuthStore(authSelectors.isOwner);
+export const useIsAdmin = () => useAuthStore(authSelectors.isAdmin);
+export const useAuthLoading = () => useAuthStore(authSelectors.isLoading);
+export const useAuthError = () => useAuthStore(authSelectors.error);
+export const useHasHydrated = () => useAuthStore(authSelectors.hasHydrated);
+export const useUserInfo = () => useAuthStore(authSelectors.userInfo);

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Rental } from "@/lib/types/entities/rental";
+import { useUserRentalsStore } from "@/store/user-rentals-store";
 import {
   FaStar,
   FaCalendarAlt,
@@ -13,14 +14,12 @@ import {
 interface RentalCardProps {
   rental: Rental;
   onReviewClick: (rental: Rental) => void;
-  hasReview: boolean;
 }
 
-export default function RentalCard({
-  rental,
-  onReviewClick,
-  hasReview,
-}: RentalCardProps) {
+export default function RentalCard({ rental, onReviewClick }: RentalCardProps) {
+  const { rentalReviews } = useUserRentalsStore();
+  const hasReview = rentalReviews[rental.id] || false;
+
   // Formatear precio
   const formatPrice = (price: string) => {
     const numPrice = parseFloat(price);
