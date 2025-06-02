@@ -175,7 +175,18 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ mode, vehicle, onSucce
 
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
         {/* Alerts */}
-        {error && <Alert type='error' title='Error' message={error} onClose={clearMessages} />}
+        {error && (
+          <Alert
+            type='error'
+            title={
+              error.toLowerCase().includes('placa') || error.toLowerCase().includes('license plate')
+                ? 'Placa duplicada'
+                : 'Error'
+            }
+            message={error}
+            onClose={clearMessages}
+          />
+        )}
 
         {success && (
           <Alert
@@ -243,11 +254,18 @@ export const VehicleForm: React.FC<VehicleFormProps> = ({ mode, vehicle, onSucce
             <input
               {...register('license_plate')}
               type='text'
-              className='glass w-full rounded-xl p-3 border border-secondary-200 focus:border-primary-400 focus:outline-none transition-colors'
+              className={`glass w-full rounded-xl p-3 border transition-colors ${
+                error && (error.toLowerCase().includes('placa') || error.toLowerCase().includes('license plate'))
+                  ? 'border-red-400 focus:border-red-500 bg-red-50'
+                  : 'border-secondary-200 focus:border-primary-400'
+              } focus:outline-none`}
               placeholder='ABC123'
               style={{ textTransform: 'uppercase' }}
             />
             {errors.license_plate && <p className='text-red-500 text-sm mt-1'>{errors.license_plate.message}</p>}
+            {error && (error.toLowerCase().includes('placa') || error.toLowerCase().includes('license plate')) && (
+              <p className='text-red-500 text-sm mt-1'>⚠️ Esta placa ya está registrada en el sistema</p>
+            )}
           </div>
 
           <div>
