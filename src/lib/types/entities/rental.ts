@@ -28,7 +28,7 @@ export type CreateRentalData = {
   vehicle_id: string;
   initialDate: string;
   finalDate: string;
-  totalCost: string;
+  totalCost: number;
   status?: RentalStatus;
 };
 
@@ -69,9 +69,9 @@ export interface RentalStats {
 }
 
 export const rentalStatusLabels: Record<string, string> = {
-  "PENDING": 'Pendiente',
-  "APPROVED": 'Aprobada',
-  "ACTIVE": 'Activa',
-  "COMPLETED": 'Completada',
-  "CANCELLED": 'Cancelada',
+  PENDING: "Pendiente",
+  APPROVED: "Aprobada",
+  ACTIVE: "Activa",
+  COMPLETED: "Completada",
+  CANCELLED: "Cancelada",
 };

@@ -1,39 +1,42 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useVehicle } from "@/hooks/useVehicle";
-import { useVehicleUnavailability } from "@/hooks/useVehicleUnavailability";
-import { useReviews } from "@/hooks/useReviews";
+import { useVehicleDetailsStore } from "@/store/vehicle-details-store";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/Calendar";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRentalStore } from "@/store/rental-store";
 
 export default function VehicleDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const vehicleId = params.id as string;
-  const { vehicle, isLoading, error, refreshVehicle } = useVehicle({
-    id: vehicleId,
-  });
+
   const {
-    unavailableDates,
-    isDateUnavailable,
-    isLoading: isLoadingUnavailability,
-    error: unavailabilityError,
-  } = useVehicleUnavailability({ vehicleId });
-  const {
-    reviews,
-    isLoading: isLoadingReviews,
-    error: reviewsError,
-  } = useReviews({ vehicleId });
+    vehicles,
+    isLoading,
+    isLoadingReviews,
+    isLoadingUnavailability,
+    error,
+    reviewsError,
+    unavailabilityError,
+    fetchVehicleDetails,
+    clearErrors,
+  } = useVehicleDetailsStore();
+
+  const vehicleDetails = vehicles[vehicleId];
+  const vehicle = vehicleDetails?.data;
+  const reviews = vehicleDetails?.reviews || [];
+  const unavailableDates = vehicleDetails?.unavailableDates || [];
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedDateRange, setSelectedDateRange] = useState<{
     startDate: Date | null;
     endDate: Date | null;
   }>({ startDate: null, endDate: null });
+
   const rentalStore = useRentalStore();
   const {
     isLoading: isRentalLoading,
@@ -42,6 +45,13 @@ export default function VehicleDetailsPage() {
     createRental,
     clearStatus,
   } = rentalStore;
+
+  // Cargar detalles del vehículo al montar el componente
+  useEffect(() => {
+    if (vehicleId) {
+      fetchVehicleDetails(vehicleId);
+    }
+  }, [vehicleId, fetchVehicleDetails]);
 
   // Format price to show in Colombian pesos
   const formatPrice = (price: string) => {
@@ -60,6 +70,7 @@ export default function VehicleDetailsPage() {
       day: "numeric",
     });
   };
+
   const handleDateRangeSelect = (
     startDate: Date | null,
     endDate: Date | null
@@ -103,7 +114,7 @@ export default function VehicleDetailsPage() {
       vehicle_id: vehicle.id,
       initialDate: selectedDateRange.startDate.toISOString(),
       finalDate: selectedDateRange.endDate.toISOString(),
-      totalCost: calculateTotalPrice().toString(),
+      totalCost: calculateTotalPrice(),
       status: "pending" as const,
     };
 
@@ -119,7 +130,7 @@ export default function VehicleDetailsPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !vehicle) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 auth-pattern">
         <div className="flex justify-center items-center py-16">
@@ -188,10 +199,14 @@ export default function VehicleDetailsPage() {
             <Alert
               type="error"
               message={`Error al cargar el vehículo: ${error}`}
-              onClose={() => {}}
+              onClose={clearErrors}
             />
             <div className="mt-4">
-              <Button onClick={refreshVehicle} variant="primary" size="md">
+              <Button
+                onClick={() => fetchVehicleDetails(vehicleId, true)}
+                variant="primary"
+                size="md"
+              >
                 Reintentar
               </Button>
             </div>
@@ -206,18 +221,11 @@ export default function VehicleDetailsPage() {
       <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 auth-pattern">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <h3 className="text-2xl font-bold gradient-text mb-4">
+            <h1 className="text-2xl font-bold text-secondary-900 mb-4">
               Vehículo no encontrado
-            </h3>
-            <p className="text-secondary-600 mb-6">
-              El vehículo que buscas no existe o ha sido eliminado.
-            </p>
-            <Button
-              onClick={() => router.push("/dashboard/vehicles")}
-              variant="primary"
-              size="md"
-            >
-              Ver todos los vehículos
+            </h1>
+            <Button onClick={() => router.back()} variant="primary" size="md">
+              Volver a vehículos
             </Button>
           </div>
         </div>
@@ -394,7 +402,6 @@ export default function VehicleDetailsPage() {
                   selectedRange={selectedDateRange}
                   className="w-full"
                   unavailableDates={unavailableDates}
-                  isDateUnavailable={isDateUnavailable}
                 />
               </div>{" "}
               {/* Action Button */}
