@@ -1,25 +1,22 @@
 import type { Vehicle } from "./vehicle";
 import type { User } from "./user";
 
-// Rental type definitions
+// Rental type definitions que coinciden con la respuesta de la API
 export interface Rental {
   id: string;
-  vehicle_id: string;
-  renterId: string;
-  initialDate: Date;
-  finalDate: Date;
+  initialDate: string; // ISO string format
+  finalDate: string; // ISO string format
+  totalCost: string; // Decimal as string
   status: RentalStatus;
-  totalCost: number;
-  paymentStatus: PaymentStatus;
-  createdAt: Date;
-  updatedAt?: Date;
-  notes?: string;
-  cancellationReason?: string;
+  client: User; // Usuario completo
+  client_id: string;
+  vehicle: Vehicle; // Vehículo completo
+  vehicle_id: string;
 }
 
 export type RentalStatus =
   | "pending"
-  | "approved"
+  | "confirmed"
   | "active"
   | "completed"
   | "cancelled";
@@ -27,20 +24,28 @@ export type RentalStatus =
 export type PaymentStatus = "PENDING" | "PAID" | "REFUNDED" | "PARTIAL";
 
 // Datos para crear una renta
-export type CreateRentalData = Pick<
-  Rental,
-  "vehicle_id" | "initialDate" | "finalDate" | "totalCost" | "status"
->;
+export type CreateRentalData = {
+  vehicle_id: string;
+  initialDate: string;
+  finalDate: string;
+  totalCost: string;
+  status?: RentalStatus;
+};
 
 // Datos para actualizar una renta
-export type UpdateRentalData = Partial<
-  Pick<Rental, "status" | "paymentStatus" | "notes" | "cancellationReason">
->;
+export type UpdateRentalData = Partial<{
+  status: RentalStatus;
+  paymentStatus: PaymentStatus;
+  notes: string;
+  cancellationReason: string;
+}>;
 
-// Renta con información completa del vehículo y usuario
-export interface RentalWithDetails extends Rental {
-  vehicle: Vehicle;
-  renter: User;
+// Datos para crear una review
+export interface CreateReviewData {
+  rental_id: string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
 }
 
 // Filtros para búsqueda de rentas
@@ -62,3 +67,11 @@ export interface RentalStats {
   totalRevenue: number;
   averageRentalDuration: number;
 }
+
+export const rentalStatusLabels: Record<string, string> = {
+  "PENDING": 'Pendiente',
+  "APPROVED": 'Aprobada',
+  "ACTIVE": 'Activa',
+  "COMPLETED": 'Completada',
+  "CANCELLED": 'Cancelada',
+};
