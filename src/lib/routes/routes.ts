@@ -2,6 +2,12 @@
  * Configuración centralizada de rutas
  */
 export const AUTH_ROUTES_CONFIG = {
+
+  ROLE_PROTECTED: {
+    ADMIN: ['/dashboard/admin'],
+    OWNER: ['/dashboard/requests']
+  } as const,
+
   // Rutas que requieren autenticación
   PROTECTED: ['/dashboard'] as const,
 
@@ -28,12 +34,24 @@ export const AUTH_ROUTES_CONFIG = {
  */
 export const RouteUtils = {
   isProtected: (pathname: string): boolean => AUTH_ROUTES_CONFIG.PROTECTED.some((route) => pathname.startsWith(route)),
-  
+
   isAuth: (pathname: string): boolean => AUTH_ROUTES_CONFIG.AUTH.some((route) => pathname.startsWith(route)),
 
   isPublic: (pathname: string): boolean => AUTH_ROUTES_CONFIG.PUBLIC.some((route) => pathname === route),
 
   isSystem: (pathname: string): boolean => AUTH_ROUTES_CONFIG.SYSTEM.some((route) => pathname.startsWith(route)),
+
+  getRequiredRoles: (pathname: string): ('ADMIN' | 'OWNER')[] => {
+    return Object.entries(AUTH_ROUTES_CONFIG.ROLE_PROTECTED)
+      .filter(([, prefixes]) =>
+        prefixes.some((prefix) => pathname.startsWith(prefix))
+      )
+      .map(([role]) => role as 'ADMIN' | 'OWNER');
+  },
+
+  isRoleProtected: (pathname: string): boolean => {
+    return RouteUtils.getRequiredRoles(pathname).length > 0;
+  },
 
   /**
    * Determina el tipo de ruta

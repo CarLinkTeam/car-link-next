@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { User, UserRole } from "../types/entities/user";
 
 // Combina y optimiza clases de Tailwind CSS de forma condicional.
 export function cn(...inputs: ClassValue[]) {
@@ -46,4 +47,12 @@ export function calculateRentalDays(
 
   // Asegurar que siempre sea al menos 1 día (cuando inicio y fin son el mismo día)
   return Math.max(1, days);
+}
+
+
+export function hasRole(user: User | null, role: UserRole): boolean {
+  if (!user || !user.roles) {
+    return false;
+  }
+  return Array.isArray(user.roles) && user.roles.includes(role);
 }
