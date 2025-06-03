@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CarLink - Renta de Carros",
+  title: "CarLink",
   description: "Plataforma de alquiler de vehículos",
 };
 
