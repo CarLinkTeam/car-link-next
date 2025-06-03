@@ -35,6 +35,7 @@ npm run test:e2e:login     # Only login tests
 npm run test:e2e:register  # Only register tests
 npm run test:e2e:errors    # Only error pages tests
 npm run test:e2e:profile   # Only profile tests
+npm run test:e2e:rental    # Only rental process tests
 ```
 
 ## Included Tests
@@ -63,6 +64,12 @@ npm run test:e2e:profile   # Only profile tests
 1. **OWNER User** – View personal information and vehicles
 2. **TENANT Promotion** – Promote to OWNER and verify empty vehicle state
 3. **TENANT Interface** – Verify UI elements before promotion
+
+#### Rental Process (`tests/pages/rental-process.spec.ts`)
+
+1. **Tenant Rental Request** – Tenant creates a rental request
+2. **Rental Request Filters** – Verify filtering and search functionality
+3. **Detailed Request Information** – Verify all required information is displayed
 
 ## Test Data
 
@@ -110,3 +117,50 @@ Tests use backend seed data:
 
 - **User**: `cliente2@carlink.com`
 - **Checks**: Profile info, TENANT role, restricted access message, no vehicle buttons
+
+### 🚗 Rental Process Tests
+
+#### Tenant Rental Request
+
+- **Tenant**: `cliente1@carlink.com`
+- **Flow**: Login → Select vehicle → View details → Navigation verification
+- **Checks**:
+  - Successful login and dashboard access
+  - Vehicle listing visibility
+  - Navigation to vehicle details page
+  - Vehicle information display (conditions, specifications, owner info)
+  - Page structure and content verification
+
+#### Rental Request Management
+
+- **User**: `propietario1@carlink.com` (Owner)
+- **Checks**:
+  - Rental requests dashboard accessibility
+  - Filter functionality (All/Pending/Confirmed/Cancelled)
+  - Search by vehicle make/model
+  - Filter state verification using select values
+  - Interface responsiveness
+
+#### Request Information Verification
+
+- **User**: `propietario1@carlink.com` (Owner)
+- **Checks**:
+  - Statistics display accuracy (Total/Pending/Confirmed/Cancelled)
+  - Vehicle information completeness in request cards
+  - Date range and cost information (when available)
+  - Status badges and visual indicators
+  - Data structure validation
+
+### 🎯 Vehicle Detail Page Testing
+
+- **Navigation**: Tests verify reliable navigation from vehicle cards to detail pages
+- **Content Verification**: Ensures all vehicle information is properly displayed
+- **Information Accuracy**: Verifies technical specifications, rental conditions, and owner details
+- **UI Components**: Tests proper rendering of images, buttons, and informational sections
+
+### 📊 Dashboard and Filtering
+
+- **Filter States**: Verify select dropdown value changes reflect correctly
+- **Search Functionality**: Text input filtering works as expected
+- **Statistics Accuracy**: Dashboard counters display correct information
+- **Data Presentation**: Information is properly structured and accessible

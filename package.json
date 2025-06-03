@@ -18,7 +18,8 @@
     "test:e2e:login": "playwright test tests/auth/login.spec.ts",
     "test:e2e:register": "playwright test tests/auth/register.spec.ts",
     "test:e2e:errors": "playwright test tests/pages/error-pages.spec.ts",
-    "test:e2e:profile": "playwright test tests/pages/profile.spec.ts"
+    "test:e2e:profile": "playwright test tests/pages/profile.spec.ts",
+    "test:e2e:rental": "playwright test tests/pages/rental-process.spec.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
