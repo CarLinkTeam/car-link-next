@@ -42,9 +42,7 @@ export function useVehicles({
     try {
       // Si no hay filtros, usar getAll
       if (!filters) {
-        console.log("Debug - Using getAll()");
         const vehiclesList = await vehicles.getAll();
-        console.log("Debug - getAll response:", vehiclesList?.length);
         setState({
           vehicles: vehiclesList,
           isLoading: false,
@@ -75,11 +73,9 @@ export function useVehicles({
       if (filters.minPrice) params.minPrice = filters.minPrice;
       if (filters.maxPrice) params.maxPrice = filters.maxPrice;
 
-      console.log("Debug - Using getWithFilters with params:", params);
       const response: VehicleListResponse = await vehicles.getWithFilters(
         params
       );
-      console.log("Debug - getWithFilters response:", response);
 
       setState({
         vehicles: response.data,
@@ -90,7 +86,6 @@ export function useVehicles({
         totalVehicles: response.total,
       });
     } catch (error) {
-      console.error("Debug - Error in fetchVehicles:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Error al cargar vehículos";
       setState({

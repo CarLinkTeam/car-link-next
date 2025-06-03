@@ -20,7 +20,6 @@ export const useOwnerRentals = () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
       const rentals = await RentalService.getOwnerRentals();
-      console.log("Rentas obtenidas:", rentals);
       setState((prev) => ({ ...prev, rentals, isLoading: false }));
     } catch (error) {
       const errorMessage =

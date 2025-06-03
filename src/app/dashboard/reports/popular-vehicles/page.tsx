@@ -22,8 +22,6 @@ export default function PopularVehiclesReportPage() {
       setLoading(true);
       const reportData = await ReportsService.getPopularVehiclesReport();
       setReport(reportData);
-    } catch (error) {
-      console.error("Error fetching report:", error);
     } finally {
       setLoading(false);
     }
@@ -86,8 +84,7 @@ export default function PopularVehiclesReportPage() {
       }.pdf`;
       pdf.download(filename);
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Error al generar el PDF. Por favor, intenta nuevamente.");
+      alert("Error al generar el PDF. Por favor, intenta nuevamente." + error);
     } finally {
       setGenerating(false);
     }

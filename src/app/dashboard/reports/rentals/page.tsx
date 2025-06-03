@@ -20,10 +20,6 @@ export default function UserRentalsReportPage() {
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Debug: verificar qué datos tiene el usuario
-    console.log("Usuario actual en rentals:", user);
-    console.log("fullName en rentals:", user?.fullName);
-
     fetchReport();
   }, [user]);
 
@@ -34,8 +30,6 @@ export default function UserRentalsReportPage() {
       setLoading(true);
       const reportData = await ReportsService.getUserRentalsReport();
       setReport(reportData);
-    } catch (error) {
-      console.error("Error fetching report:", error);
     } finally {
       setLoading(false);
     }
@@ -124,8 +118,7 @@ export default function UserRentalsReportPage() {
       }.pdf`;
       pdf.download(filename);
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Error al generar el PDF. Por favor, intenta nuevamente.");
+      alert("Error al generar el PDF. Por favor, intenta nuevamente. " + error);
     } finally {
       setGenerating(false);
     }

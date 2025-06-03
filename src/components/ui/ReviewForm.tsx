@@ -45,7 +45,7 @@ export default function ReviewForm({
       setComment("");
       onClose();
     } catch (error) {
-      console.error("Error al crear review:", error);
+      alert("Error al crear review:" + error);
     }
   };
 

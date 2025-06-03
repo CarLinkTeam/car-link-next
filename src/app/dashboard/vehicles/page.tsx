@@ -73,19 +73,6 @@ export default function VehiclesPage() {
     return buttons;
   };
 
-  // Debug logging
-  console.log("Debug - Page state:", {
-    searchTerm,
-    currentPage,
-    allVehicles: allVehicles?.length,
-    filteredVehicles: filteredVehicles?.length,
-    vehicles: vehicles?.length,
-    totalPages,
-    totalVehicles,
-    isLoading,
-    error,
-  });
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 auth-pattern">
       {successMessage && (
