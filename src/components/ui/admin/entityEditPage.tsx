@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "../Button";
+import { Alert } from "../Alert";
 
 interface EntityEditPageProps<T> {
   title: string;
@@ -19,7 +20,7 @@ export default function EntityEditPage<T>({
 }: EntityEditPageProps<T>) {
   const { id } = useParams();
   const router = useRouter();
-
+  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -36,12 +37,14 @@ export default function EntityEditPage<T>({
     if (!id || typeof id !== "string") return;
     setSubmitting(true);
     setError(null);
+    setAlert(null);
     try {
       const response = await onUpdate(id, updated);
-
-      console.log(response); router.back();
+      setAlert({ type: "success", message: "Cambios guardados correctamente." });
+      setTimeout(() => router.back(), 1500);
     } catch (err) {
       setError("Error al guardar los cambios.");
+      setAlert({ type: "error", message: "No se pudieron guardar los cambios." });
       setSubmitting(false);
     }
   };
@@ -82,6 +85,18 @@ export default function EntityEditPage<T>({
       {!loading && data && (
         <div className="bg-white rounded-3xl shadow-lg p-8 space-y-6">
           {renderForm(data, handleSubmit, submitting)}
+          {/* Mostrar alerta */}
+          {alert && (
+            <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+              <Alert
+                type={alert.type}
+                message={alert.message}
+                onClose={() => setAlert(null)}
+                className="w-auto max-w-xs pointer-events-auto"
+              />
+            </div>
+          )}
+
           {error && (
             <p className="text-red-600 font-semibold text-center">
               {error}

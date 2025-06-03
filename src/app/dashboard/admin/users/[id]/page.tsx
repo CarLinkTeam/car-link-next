@@ -21,8 +21,18 @@ export default function UserDetailPage() {
                         <DetailItem label="Teléfono" value={user.phone || '—'} />
                         <DetailItem label="Ubicación" value={user.location || '—'} />
                         <DetailItem
-                            label="Rol"
-                            value={user.roles.map((role) => role.charAt(0) + role.slice(1).toLowerCase()).join(', ')}
+                            label="Roles"
+                            value={user.roles
+                                .map((role) => {
+                                    const roleTranslations: Record<string, string> = {
+                                        "ADMIN": 'Administrador',
+                                        "TENANT": 'Arrendatario',
+                                        "OWNER": 'Propietario',
+                                    };
+                                    return roleTranslations[role] || role; // Si no hay traducción, muestra el valor original
+                                })
+                                .join(', ')
+                            }
                         />
                         <DetailItem label="Estado" value={user.isActive ? 'Activo' : 'Inactivo'} />
                         <DetailItem

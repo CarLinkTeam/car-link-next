@@ -7,7 +7,7 @@ interface LoginResponse {
   token: string
 }
 
-export interface PromoteToOwnerResponse {
+export interface PromoteToResponse {
   message: string
   user: AuthUser
 }
@@ -21,7 +21,12 @@ export const AuthService = {
     return apiClient.post<LoginResponse>('/auth/register', data)
   },
 
-  promoteToOwner: async (userId: string): Promise<PromoteToOwnerResponse> => {
-    return apiClient.post<PromoteToOwnerResponse>(`/auth/promoteToOwner/${userId}`, {})
+  promoteToOwner: async (userId: string): Promise<PromoteToResponse> => {
+    return apiClient.post<PromoteToResponse>(`/auth/promoteToOwner/${userId}`, {})
+  },
+
+  promoteToAdmin: async (userId: string): Promise<PromoteToResponse> => {
+    return apiClient.post<PromoteToResponse>(`/auth/promoteToAdmin/${userId}`, {})
   },
 }
+

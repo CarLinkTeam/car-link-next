@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { AuthService } from '@/lib/api/services/auth-service';
+import { UserRole } from '@/lib/types';
+import { Alert } from '../Alert';
+import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -10,6 +14,7 @@ interface User {
   phone?: string;
   location?: string;
   email?: string;
+  roles?: UserRole[];
 }
 
 interface UserFormData {
@@ -39,8 +44,16 @@ export default function UserForm({ user, onSubmit, submitting }: UserFormProps) 
     location: user?.location || '',
     password: '',
   });
+  const [currentUser, setCurrentUser] = useState<User | undefined>(user);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
+
+  const [alert, setAlert] = useState<{
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    title?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -49,9 +62,11 @@ export default function UserForm({ user, onSubmit, submitting }: UserFormProps) 
         phone: user.phone || '',
         location: user.location || '',
         password: '',
+        roles: user.roles || [],
       };
       setFormData(newForm);
       setInitialFormData(newForm);
+      setCurrentUser(user);
     }
   }, [user]);
 
@@ -132,7 +147,11 @@ export default function UserForm({ user, onSubmit, submitting }: UserFormProps) 
   };
 
   return (
+
+
+
     <form onSubmit={handleSubmit} className="space-y-6">
+
       {/* Email (solo lectura) */}
       {user?.email && (
         <Input
@@ -196,8 +215,56 @@ export default function UserForm({ user, onSubmit, submitting }: UserFormProps) 
         showPasswordToggle={true}
       />
 
-      {/* Botón de envío */}
+
+
+
+      {alert && (
+        <Alert
+          type={alert.type}
+          message={alert.message}
+          title={alert.title}
+          onClose={() => setAlert(null)}
+          className="mb-2 w-full"
+        />
+      )}
       <div className="flex justify-end space-x-4">
+        {/* Botón para promover a admin */}
+        {currentUser?.id && currentUser.roles && !currentUser.roles.includes('ADMIN') && (
+          <div className="flex flex-col items-end">
+
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  await AuthService.promoteToAdmin(currentUser.id);
+
+                  const updatedRoles = [...(currentUser.roles || []), 'ADMIN' as UserRole];
+
+                  setCurrentUser(prev => prev ? { ...prev, roles: updatedRoles } : prev);
+                  setFormData(prev => ({ ...prev, roles: updatedRoles }));
+
+                  setAlert({
+                    type: 'success',
+                    title: 'Usuario promovido',
+                    message: 'El usuario ha sido promovido a administrador exitosamente.',
+                  });
+                  setTimeout(() => router.back(), 1500);
+                } catch (error) {
+                  console.error(error);
+                  setAlert({
+                    type: 'error',
+                    title: 'Error',
+                    message: 'Hubo un problema al promover al usuario.',
+                  });
+                }
+              }}
+            >
+              Promover a admin
+            </Button>
+          </div>
+        )}
         <Button
           type="submit"
           disabled={!isFormChanged() || submitting}
