@@ -3,8 +3,6 @@
 import { DetailItem } from "@/components/ui/admin/DetailItemPage";
 import EntityDetailPage from "@/components/ui/admin/entityDetailPage";
 import { UserService } from "@/lib/api/services/user-service";
-import { DiVim } from "react-icons/di";
-
 
 export default function UserDetailPage() {
     return (
@@ -12,7 +10,7 @@ export default function UserDetailPage() {
             title="Usuario"
             getOne={UserService.getById}
             onDelete={UserService.delete}
-            getEditPath={(id) => `/users/${id}/edit`}
+            getEditPath={(id) => `${id}/edit`}
             renderDetails={(user) => (
                 <>
                     <DetailItem label="ID" value={user.id} />

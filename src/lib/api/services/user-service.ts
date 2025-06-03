@@ -38,4 +38,14 @@ export const UserService = {
   delete: async (id: string): Promise<void> => {
     return apiClient.delete(`/users/${id}`)
   },
+
+  updatePartial: async (id: string, data: Partial<User>): Promise<User> => {
+    const response = await apiClient.patch<User>(`/users/${id}`, data);
+    return response;
+  },
+
+  getByIdUser: async (id: string): Promise<User> => {
+    const response = await apiClient.get<User>(`/users/${id}`);
+    return response;
+  }
 }

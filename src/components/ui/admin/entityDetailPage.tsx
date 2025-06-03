@@ -10,6 +10,8 @@ interface EntityDetailPageProps<T> {
   getOne: (id: string) => Promise<T | null>;
   renderDetails: (item: T) => React.ReactNode;
   onDelete: (id: string) => Promise<void>;
+  deleteOption?: boolean;
+  editOption?: boolean;
   getEditPath: (id: string) => string;
 }
 
@@ -18,6 +20,8 @@ export default function EntityDetailPage<T>({
   getOne,
   renderDetails,
   onDelete,
+  deleteOption = true,
+  editOption = true,
   getEditPath,
 }: EntityDetailPageProps<T>) {
   const { id } = useParams();
@@ -99,12 +103,16 @@ export default function EntityDetailPage<T>({
           {renderDetails(data)}
 
           <div className="flex justify-end space-x-4">
+            {editOption && (
             <Button onClick={handleEdit} variant="outline">
               Editar
             </Button>
+            )}
+            {deleteOption && (
             <Button onClick={() => setShowDeleteForm(true)} variant="destructive" disabled={deleting}>
               {deleting ? "Eliminando..." : "Eliminar"}
             </Button>
+            )}
           </div>
         </div>
       )}
