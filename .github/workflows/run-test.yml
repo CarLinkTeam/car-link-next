@@ -29,7 +29,7 @@ jobs:
         run: npm ci --prefer-offline
 
       - name: Run Unit Tests with Coverage
-        run: npm run test:cov || echo "⚠️ Tests failed but continuing..."
+        run: npm run test:coverage || echo "⚠️ Tests failed but continuing..."
 
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
