@@ -132,7 +132,7 @@ export default function VehicleDetailsPage() {
         )}`
       );
     } catch (error) {
-      console.error("Error al crear la renta:", error);
+      alert("Error al crear la renta:" + error);
     }
   };
 

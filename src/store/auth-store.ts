@@ -193,16 +193,12 @@ export const useAuthStore = create<AuthState>()(
         if (!currentUser || currentUser.fullName) return;
 
         set({ isLoading: true });
-        try {
-          const fetchedUser = await users.getById(currentUser.id);
-          set((state) => ({
-            user: { ...state.user, ...fetchedUser },
-            isLoading: false,
-          }));
-        } catch (error) {
-          console.error("Error fetching full user info:", error);
-          set({ isLoading: false });
-        }
+
+        const fetchedUser = await users.getById(currentUser.id);
+        set((state) => ({
+          user: { ...state.user, ...fetchedUser },
+          isLoading: false,
+        }));
       },
     }),
     {

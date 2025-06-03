@@ -23,10 +23,6 @@ export default function OwnerIncomeReportPage() {
       return;
     }
 
-    // Debug: verificar qué datos tiene el usuario
-    console.log("Usuario actual:", user);
-    console.log("fullName:", user.fullName);
-
     fetchReport();
   }, [user]);
 
@@ -37,8 +33,6 @@ export default function OwnerIncomeReportPage() {
       setLoading(true);
       const reportData = await ReportsService.getOwnerIncomeReport();
       setReport(reportData);
-    } catch (error) {
-      console.error("Error fetching report:", error);
     } finally {
       setLoading(false);
     }
@@ -128,8 +122,7 @@ export default function OwnerIncomeReportPage() {
       }.pdf`;
       pdf.download(filename);
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Error al generar el PDF. Por favor, intenta nuevamente.");
+      alert("Error al generar el PDF. Por favor, intenta nuevamente. " + error);
     } finally {
       setGenerating(false);
     }

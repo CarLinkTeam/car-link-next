@@ -36,7 +36,7 @@ export const useAutoRefresh = (
       try {
         await refreshFunctionRef.current();
       } catch (error) {
-        console.error("Error en auto-refresh:", error);
+        alert("Error en auto-refresh:" + error);
       }
     }, intervalMs);
 
@@ -54,7 +54,7 @@ export const useAutoRefresh = (
     try {
       await refreshFunctionRef.current();
     } catch (error) {
-      console.error("Error en force refresh:", error);
+      alert("Error en force refresh:" + error);
     }
   };
 

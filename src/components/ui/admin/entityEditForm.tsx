@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
+import { useState } from "react";
+import { Button } from "@/components/ui/Button";
 
 const editableFieldsByEntity: Record<string, string[]> = {
-  users: ['fullName', 'location', 'phone'],
-  vehicles: ['vehicleModel', 'make', 'color', 'license_plate'],
-  rentals: ['vehicle_id']
+  users: ["fullName", "location", "phone"],
+  vehicles: ["vehicleModel", "make", "color", "license_plate"],
+  rentals: ["vehicle_id"],
 };
 
 interface EntityEditFormProps {
@@ -40,8 +40,7 @@ export default function EntityEditForm({
       );
       await onSave(filteredData);
     } catch (err) {
-      console.log(err);
-      setError(err instanceof Error ? err.name : 'Error al guardar');
+      setError(err instanceof Error ? err.name : "Error al guardar");
     } finally {
       setIsSaving(false);
     }
@@ -49,7 +48,6 @@ export default function EntityEditForm({
 
   return (
     <div className="space-y-4">
-
       {Object.entries(formData).map(([key, value]) => {
         if (!editableFields.includes(key)) return null;
 
@@ -60,7 +58,7 @@ export default function EntityEditForm({
             </label>
             <input
               type="text"
-              value={value ?? ''}
+              value={value ?? ""}
               onChange={(e) => handleChange(key, e.target.value)}
               className="w-full px-3 py-2 border rounded shadow-sm"
             />
@@ -72,7 +70,7 @@ export default function EntityEditForm({
 
       <div className="flex gap-4 mt-6">
         <Button onClick={handleSubmit} disabled={isSaving} variant="primary">
-          {isSaving ? 'Guardando...' : 'Guardar'}
+          {isSaving ? "Guardando..." : "Guardar"}
         </Button>
         <Button onClick={onCancel} variant="secondary">
           Cancelar

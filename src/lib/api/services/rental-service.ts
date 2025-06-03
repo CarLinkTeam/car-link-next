@@ -44,7 +44,6 @@ export const RentalService = {
       const response = await apiClient.get<boolean>(
         `/rentals/${rentalId}/has-review`
       );
-      console.log("Esta es la rese de la review:", response);
       return response;
     } catch {
       return false;
@@ -56,7 +55,7 @@ export const RentalService = {
     return response;
   },
 
-   /**
+  /**
    * Confirma una renta pendiente
    */
   confirmRental: async (id: string): Promise<Rental> => {
@@ -70,5 +69,5 @@ export const RentalService = {
   rejectRental: async (id: string): Promise<Rental> => {
     const response = await apiClient.patch<Rental>(`/rentals/${id}/reject`);
     return response;
-  }
+  },
 };
