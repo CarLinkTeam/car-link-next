@@ -7,12 +7,12 @@ test.describe('Login', () => {
   })
 
   test('Login exitoso con credenciales correctas', async ({ page }) => {
-    const usuario = USERS.admin
+    const user = USERS.admin
 
     // Usar credenciales válidas
-    await page.getByRole('textbox', { name: 'Correo electrónico' }).fill(usuario.email)
+    await page.getByRole('textbox', { name: 'Correo electrónico' }).fill(user.email)
     const passwordField = page.getByRole('textbox', { name: 'Contraseña' })
-    await passwordField.fill(usuario.password)
+    await passwordField.fill(user.password)
     await passwordField.blur() // Hacer que el campo pierda el foco para activar validación
     await page.waitForTimeout(200) // Esperar a que se estabilicen las animaciones
 

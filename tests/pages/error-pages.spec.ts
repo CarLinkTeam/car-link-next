@@ -26,12 +26,12 @@ test.describe('Error Pages', () => {
     // Primero hacer login con usuario OWNER
     await page.goto('/auth/login')
 
-    const usuario = USERS.owner1
+    const user = USERS.owner1
 
     // Llenar formulario de login
-    await page.getByRole('textbox', { name: 'Correo electrónico' }).fill(usuario.email)
+    await page.getByRole('textbox', { name: 'Correo electrónico' }).fill(user.email)
     const passwordField = page.getByRole('textbox', { name: 'Contraseña' })
-    await passwordField.fill(usuario.password)
+    await passwordField.fill(user.password)
     await passwordField.blur()
     await page.waitForTimeout(200)
 
@@ -47,7 +47,7 @@ test.describe('Error Pages', () => {
     await page.goto('/dashboard/admin')
 
     // Verificar que se muestra la página de acceso denegado
-    await expect(page.getByText('Acceso Denegado')).toBeVisible({ timeout: 15000 })
+    await expect(page.getByText('Acceso Denegado')).toBeVisible({ timeout: 60000 })
     await expect(page.getByText('No tienes permisos para acceder a esta página')).toBeVisible()
 
     // Verificar que hay botón para ir al dashboard

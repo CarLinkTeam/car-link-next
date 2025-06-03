@@ -14,7 +14,11 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:errors": "playwright test tests/pages/error-pages.spec.ts"
+    "test:e2e:auth": "playwright test tests/auth/",
+    "test:e2e:login": "playwright test tests/auth/login.spec.ts",
+    "test:e2e:register": "playwright test tests/auth/register.spec.ts",
+    "test:e2e:errors": "playwright test tests/pages/error-pages.spec.ts",
+    "test:e2e:profile": "playwright test tests/pages/profile.spec.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
