@@ -60,16 +60,12 @@ export default function RentalsPage() {
   };
 
   const handleReviewSubmit = async (reviewData: CreateReviewData) => {
-    try {
-      const result = await createReview(reviewData);
-      if (result) {
-        setShowSuccessAlert(true);
-        setIsReviewFormOpen(false);
-        setSelectedRental(null);
-        setTimeout(() => setShowSuccessAlert(false), 5000);
-      }
-    } catch (error) {
-      console.error("Error al crear review:", error);
+    const result = await createReview(reviewData);
+    if (result) {
+      setShowSuccessAlert(true);
+      setIsReviewFormOpen(false);
+      setSelectedRental(null);
+      setTimeout(() => setShowSuccessAlert(false), 5000);
     }
   };
 
