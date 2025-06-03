@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useAuthStore } from "@/store/auth-store";
+import { useUserWithFullName } from "@/store/auth-store";
 import { hasRole } from "@/lib/utils/utils";
 import { User } from "@/lib/types";
 import {
@@ -11,7 +11,7 @@ import {
 import { PDFGenerator, formatCurrency } from "@/lib/utils/pdf-generator";
 
 export default function OwnerIncomeReportPage() {
-  const { user } = useAuthStore();
+  const user = useUserWithFullName();
   const [report, setReport] = useState<OwnerIncomeReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -22,6 +22,11 @@ export default function OwnerIncomeReportPage() {
       window.location.href = "/dashboard";
       return;
     }
+
+    // Debug: verificar qué datos tiene el usuario
+    console.log("Usuario actual:", user);
+    console.log("fullName:", user.fullName);
+
     fetchReport();
   }, [user]);
 
@@ -53,10 +58,9 @@ export default function OwnerIncomeReportPage() {
       yPosition += 20;
 
       // Información del propietario
-      yPosition = pdf.addSubtitle(
-        `Propietario: ${user?.fullName || "Propietario"}`,
-        yPosition
-      );
+      const userName =
+        user?.fullName || user?.email?.split("@")[0] || "Propietario";
+      yPosition = pdf.addSubtitle(`Propietario: ${userName}`, yPosition);
       yPosition = pdf.addText(
         `Email: ${user?.email || "No disponible"}`,
         yPosition
@@ -118,7 +122,7 @@ export default function OwnerIncomeReportPage() {
 
       const userNameForFile = user?.fullName
         ? user.fullName.replace(/\s+/g, "-")
-        : "propietario";
+        : user?.email?.split("@")[0]?.replace(/\s+/g, "-") || "propietario";
       const filename = `reporte-ingresos-${userNameForFile}-${
         new Date().toISOString().split("T")[0]
       }.pdf`;

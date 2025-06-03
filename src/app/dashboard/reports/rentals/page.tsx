@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useAuthStore } from "@/store/auth-store";
+import { useUserWithFullName } from "@/store/auth-store";
 import {
   ReportsService,
   UserRentalsReport,
@@ -13,15 +13,19 @@ import {
 } from "@/lib/utils/pdf-generator";
 
 export default function UserRentalsReportPage() {
-  const { user } = useAuthStore();
+  const user = useUserWithFullName();
   const [report, setReport] = useState<UserRentalsReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Debug: verificar qué datos tiene el usuario
+    console.log("Usuario actual en rentals:", user);
+    console.log("fullName en rentals:", user?.fullName);
+
     fetchReport();
-  }, []);
+  }, [user]);
 
   const fetchReport = async () => {
     if (!user) return;
@@ -51,10 +55,9 @@ export default function UserRentalsReportPage() {
       yPosition += 20;
 
       // Información del usuario
-      yPosition = pdf.addSubtitle(
-        `Usuario: ${user?.fullName || "Usuario"}`,
-        yPosition
-      );
+      const userName =
+        user?.fullName || user?.email?.split("@")[0] || "Usuario";
+      yPosition = pdf.addSubtitle(`Usuario: ${userName}`, yPosition);
       yPosition = pdf.addText(
         `Email: ${user?.email || "No disponible"}`,
         yPosition
@@ -115,7 +118,7 @@ export default function UserRentalsReportPage() {
 
       const userNameForFile = user?.fullName
         ? user.fullName.replace(/\s+/g, "-")
-        : "usuario";
+        : user?.email?.split("@")[0]?.replace(/\s+/g, "-") || "usuario";
       const filename = `reporte-alquileres-${userNameForFile}-${
         new Date().toISOString().split("T")[0]
       }.pdf`;

@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { LoginFormData, RegisterFormData } from "@/lib/validations/auth";
 import { AuthUser, UserRole } from "@/lib/types";
 import { auth, users } from "@/lib/api";
+import React from "react";
 
 interface AuthState {
   user: AuthUser | null;
@@ -57,11 +58,11 @@ export const authSelectors = {
   userInfo: (state: AuthState) =>
     state.user
       ? {
-        id: state.user.id,
-        fullName: state.user.fullName,
-        email: state.user.email,
-        roles: state.user.roles,
-      }
+          id: state.user.id,
+          fullName: state.user.fullName,
+          email: state.user.email,
+          roles: state.user.roles,
+        }
       : null,
 };
 
@@ -93,7 +94,6 @@ export const useAuthStore = create<AuthState>()(
           if (!user.fullName) {
             await get().ensureUserFullName();
           }
-
         } catch (error) {
           const message =
             error instanceof Error ? error.message : "Error desconocido";
@@ -204,8 +204,6 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         }
       },
-
-
     }),
     {
       name: "auth-store",
@@ -240,3 +238,18 @@ export const useAuthLoading = () => useAuthStore(authSelectors.isLoading);
 export const useAuthError = () => useAuthStore(authSelectors.error);
 export const useHasHydrated = () => useAuthStore(authSelectors.hasHydrated);
 export const useUserInfo = () => useAuthStore(authSelectors.userInfo);
+
+// Hook personalizado que asegura que el fullName esté disponible
+export const useUserWithFullName = () => {
+  const user = useUser();
+  const { ensureUserFullName } = useAuthStore();
+
+  // Asegurar que el fullName esté disponible
+  React.useEffect(() => {
+    if (user && !user.fullName) {
+      ensureUserFullName();
+    }
+  }, [user, ensureUserFullName]);
+
+  return user;
+};
