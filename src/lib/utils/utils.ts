@@ -56,3 +56,21 @@ export function hasRole(user: User | null, role: UserRole): boolean {
   }
   return Array.isArray(user.roles) && user.roles.includes(role);
 }
+
+export const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+  };
+
+
+export const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
