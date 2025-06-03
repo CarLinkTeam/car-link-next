@@ -41,7 +41,10 @@ describe("EntityDeleteForm", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Eliminar" }));
-    expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    
+    await waitFor(() => {
+      expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("debe mostrar error cuando onDelete falla", async () => {

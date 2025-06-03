@@ -17,9 +17,10 @@ jest.mock("@/hooks/vehicles/useUpdateVehicle", () => ({
 
 // Mock de next-cloudinary
 jest.mock("next-cloudinary", () => ({
-  CldUploadWidget: ({ children }: { children: ReactNode }) => (
-    <div data-testid="upload-widget">{children}</div>
-  ),
+  CldUploadWidget: ({ children }: { children: ({ open }: { open: () => void }) => ReactNode }) => {
+    const mockOpen = jest.fn();
+    return <div data-testid="upload-widget">{children({ open: mockOpen })}</div>;
+  },
 }));
 
 const mockVehicle: Vehicle = {

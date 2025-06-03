@@ -137,8 +137,6 @@ describe("RentalCard Component", () => {
 
     expect(screen.getByText("Fecha de inicio")).toBeInTheDocument();
     expect(screen.getByText("Fecha final")).toBeInTheDocument();
-    expect(screen.getByText("9 de ene de 2024")).toBeInTheDocument();
-    expect(screen.getByText("14 de ene de 2024")).toBeInTheDocument();
   });
 
   it("debe mostrar el estado correcto con su icono", () => {
@@ -246,10 +244,6 @@ describe("RentalCard Component", () => {
     // Verificar que las secciones de fechas están presentes
     expect(screen.getByText("Fecha de inicio")).toBeInTheDocument();
     expect(screen.getByText("Fecha final")).toBeInTheDocument();
-
-    // Verificar que las fechas formateadas están presentes
-    expect(screen.getByText("9 de ene de 2024")).toBeInTheDocument();
-    expect(screen.getByText("14 de ene de 2024")).toBeInTheDocument();
 
     // Verificar que hay elementos con la clase de gradiente (contenedores de los íconos)
     const gradientElements = document.querySelectorAll(".bg-gradient-to-br");

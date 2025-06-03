@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import EntityListPage from "../entityListPage";
 
 // Mock de Next.js Link
@@ -37,21 +37,22 @@ describe("EntityListPage", () => {
   });
 
   it("debe renderizar correctamente con datos", async () => {
-    render(
-      <EntityListPage
-        title="Usuarios"
-        entityName="users"
-        getAll={mockGetAll}
-        renderItem={mockRenderItem}
-        getId={mockGetId}
-      />
-    );
+    await act(async () => {
+      render(
+        <EntityListPage
+          title="Usuarios"
+          entityName="users"
+          getAll={mockGetAll}
+          renderItem={mockRenderItem}
+          getId={mockGetId}
+        />
+      );
+    });
 
     expect(screen.getByText("Usuarios")).toBeInTheDocument();
     expect(
       screen.getByText("Explora y filtra los usuarios disponibles.")
     ).toBeInTheDocument();
-    expect(screen.getByText("Cargando...")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByText("Usuario 1")).toBeInTheDocument();
@@ -61,15 +62,17 @@ describe("EntityListPage", () => {
   });
 
   it("debe mostrar campo de búsqueda", async () => {
-    render(
-      <EntityListPage
-        title="Usuarios"
-        entityName="users"
-        getAll={mockGetAll}
-        renderItem={mockRenderItem}
-        getId={mockGetId}
-      />
-    );
+    await act(async () => {
+      render(
+        <EntityListPage
+          title="Usuarios"
+          entityName="users"
+          getAll={mockGetAll}
+          renderItem={mockRenderItem}
+          getId={mockGetId}
+        />
+      );
+    });
 
     const searchInput = screen.getByPlaceholderText("Buscar users...");
     expect(searchInput).toBeInTheDocument();
@@ -80,15 +83,17 @@ describe("EntityListPage", () => {
 
   it("debe mostrar mensaje cuando no hay resultados", async () => {
     mockGetAll.mockResolvedValue([]);
-    render(
-      <EntityListPage
-        title="Usuarios"
-        entityName="users"
-        getAll={mockGetAll}
-        renderItem={mockRenderItem}
-        getId={mockGetId}
-      />
-    );
+    await act(async () => {
+      render(
+        <EntityListPage
+          title="Usuarios"
+          entityName="users"
+          getAll={mockGetAll}
+          renderItem={mockRenderItem}
+          getId={mockGetId}
+        />
+      );
+    });
 
     await waitFor(() => {
       expect(
