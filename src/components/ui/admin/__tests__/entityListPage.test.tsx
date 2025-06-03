@@ -20,15 +20,7 @@ interface TestItem {
 }
 
 describe("EntityListPage", () => {
-  const mockService = {
-    getAll: jest.fn(),
-    getById: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    updateById: jest.fn(),
-    delete: jest.fn(),
-    deleteById: jest.fn(),
-  };
+  const mockGetAll = jest.fn();
 
   const mockData: TestItem[] = [
     { id: "1", name: "Usuario 1" },
@@ -41,20 +33,24 @@ describe("EntityListPage", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockService.getAll.mockResolvedValue(mockData);
+    mockGetAll.mockResolvedValue(mockData);
   });
 
   it("debe renderizar correctamente con datos", async () => {
     render(
       <EntityListPage
+        title="Usuarios"
         entityName="users"
-        service={mockService}
+        getAll={mockGetAll}
         renderItem={mockRenderItem}
         getId={mockGetId}
       />
     );
 
-    expect(screen.getByText(/users.*list/i)).toBeInTheDocument();
+    expect(screen.getByText("Usuarios")).toBeInTheDocument();
+    expect(
+      screen.getByText("Explora y filtra los usuarios disponibles.")
+    ).toBeInTheDocument();
     expect(screen.getByText("Cargando...")).toBeInTheDocument();
 
     await waitFor(() => {
@@ -67,8 +63,9 @@ describe("EntityListPage", () => {
   it("debe mostrar campo de búsqueda", async () => {
     render(
       <EntityListPage
+        title="Usuarios"
         entityName="users"
-        service={mockService}
+        getAll={mockGetAll}
         renderItem={mockRenderItem}
         getId={mockGetId}
       />
@@ -82,11 +79,12 @@ describe("EntityListPage", () => {
   });
 
   it("debe mostrar mensaje cuando no hay resultados", async () => {
-    mockService.getAll.mockResolvedValue([]);
+    mockGetAll.mockResolvedValue([]);
     render(
       <EntityListPage
+        title="Usuarios"
         entityName="users"
-        service={mockService}
+        getAll={mockGetAll}
         renderItem={mockRenderItem}
         getId={mockGetId}
       />

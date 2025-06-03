@@ -55,10 +55,17 @@ const mockRental: Rental = {
 describe("ReviewForm Component", () => {
   const mockOnClose = jest.fn();
   const mockOnSubmit = jest.fn();
+  let alertSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockOnSubmit.mockResolvedValue(undefined);
+    // Mock window.alert
+    alertSpy = jest.spyOn(window, "alert").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    alertSpy.mockRestore();
   });
 
   it("no debe renderizar cuando isOpen es false", () => {
@@ -261,11 +268,16 @@ describe("ReviewForm Component", () => {
       />
     );
 
-    const submitButton = screen.getByText("Calificar");
-    fireEvent.click(submitButton);
+    // Buscar el form directamente
+    const form = document.querySelector("form");
+    expect(form).toBeInTheDocument();
 
-    // El botón debe estar deshabilitado cuando no hay calificación
-    expect(submitButton).toBeDisabled();
+    fireEvent.submit(form!);
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Por favor selecciona una calificación"
+    );
+    expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
   it("debe enviar el formulario con los datos correctos", async () => {
@@ -417,9 +429,6 @@ describe("ReviewForm Component", () => {
   });
 
   it("debe manejar errores durante el envío", async () => {
-    const consoleSpy = jest
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
     mockOnSubmit.mockRejectedValue(new Error("Error de prueba"));
 
     render(
@@ -447,13 +456,10 @@ describe("ReviewForm Component", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "Error al crear review:",
-        expect.any(Error)
+      expect(alertSpy).toHaveBeenCalledWith(
+        "Error al crear review:Error: Error de prueba"
       );
     });
-
-    consoleSpy.mockRestore();
   });
 
   it("debe resetear el formulario al cerrar", () => {
