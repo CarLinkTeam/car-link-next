@@ -14,6 +14,7 @@ export default function DashboardLayout({
   const { user, logout } = useAuthStore();
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-white to-primary-50">
       {" "}
       {/* Navigation Header */}

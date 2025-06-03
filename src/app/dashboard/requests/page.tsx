@@ -6,7 +6,7 @@ import { FaFilter, FaSearch, FaChartBar } from "react-icons/fa";
 import RentalRequestCard from "@/components/ui/RequestCard";
 
 export default function OwnerRentalsPage() {
-  const { rentals, isLoading, error, updateRentalStatus } = useOwnerRentals();
+  const { rentals, isLoading, error , updateRentalStatus } = useOwnerRentals();
 
   const [filterStatus, setFilterStatus] = useState<
     "all" | "pending" | "confirmed" | "cancelled"
@@ -41,8 +41,26 @@ export default function OwnerRentalsPage() {
   const getStatusCount = (status: string) =>
     rentals.filter((rental) => rental.status === status).length;
 
-  if (isLoading) return <p>Cargando rentas...</p>;
-  if (error) return <p>Error: {error}</p>;
+    if (isLoading && rentals.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-secondary-600">Cargando rentas...</p>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500">Error al cargar las solicitudes de renta</p>
+          <p className="text-secondary-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -110,7 +128,11 @@ export default function OwnerRentalsPage() {
       </div>
 
       {filteredRentals.length === 0 ? (
-        <p>No se encontraron rentas con los filtros seleccionados.</p>
+        <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-secondary-600">No se encontraron solicitudes de renta</p>
+        </div>
+      </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRentals.map((rental) => (
