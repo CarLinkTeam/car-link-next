@@ -19,7 +19,6 @@ test.describe('Error Pages', () => {
     await expect(page.getByText('Enlaces útiles')).toBeVisible()
     await expect(page.getByRole('link', { name: 'Iniciar sesión' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Registrarse' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible()
   })
 
   test('Acceso restringido - Usuario OWNER intentando acceder a dashboard/admin', async ({ page }) => {

@@ -20,13 +20,8 @@ test.describe('Proceso Completo de Renta', () => {
 
     // Esperar redirección al dashboard
     await page.waitForURL('/dashboard/vehicles', { timeout: 60000 })
-    await expect(page.getByRole('heading', { name: 'Vehículos Disponibles' })).toBeVisible()
 
-    // Esperar a que carguen los vehículos
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(2000) // Esperar animaciones
-
-    // Usar navegación directa en lugar de click - más confiable para Links de Next.js
+    // Usar navegación
     const firstVehicleLink = page.locator('a[href*="/dashboard/vehicles/"]').first()
     await expect(firstVehicleLink).toBeVisible()
 

@@ -26,6 +26,9 @@ npm run seed
 ### 3. Run the Tests
 
 ```bash
+# Setup
+npx playwright install
+
 # All tests
 npm run test:e2e
 
@@ -36,6 +39,7 @@ npm run test:e2e:register  # Only register tests
 npm run test:e2e:errors    # Only error pages tests
 npm run test:e2e:profile   # Only profile tests
 npm run test:e2e:rental    # Only rental process tests
+npm run test:e2e:reports   # Only reports pages tests
 ```
 
 ## Included Tests
@@ -71,6 +75,15 @@ npm run test:e2e:rental    # Only rental process tests
 2. **Rental Request Filters** – Verify filtering and search functionality
 3. **Detailed Request Information** – Verify all required information is displayed
 
+#### Reports Pages (`tests/pages/reports.spec.ts`)
+
+1. **Rental Reports Access** – Verify access to rental reports page
+2. **Income Reports Access** – Verify access to income reports page
+3. **Popular Vehicles Reports Access** – Verify access to popular vehicles reports page
+4. **Navigation Between Reports** – Verify navigation between different report pages
+5. **PDF Generation Functionality** – Verify PDF generation button behavior
+6. **Page Structure and Accessibility** – Verify proper page structure and accessibility
+
 ## Test Data
 
 Tests use backend seed data:
@@ -80,6 +93,7 @@ Tests use backend seed data:
 - **Admin**: `admin@carlink.com` / `admin123`
 - **Owner1**: `propietario1@carlink.com` / `propietario` (has vehicles)
 - **Owner2**: `propietario2@carlink.com` / `propietario`
+- **Owner Reports**: Uses `USERS.owner1` from `test-data` (for reports testing)
 - **Tenant1**: `cliente1@carlink.com` / `cliente` (for promotion tests)
 - **Tenant2**: `cliente2@carlink.com` / `cliente` (for UI verification)
 
@@ -150,6 +164,49 @@ Tests use backend seed data:
   - Date range and cost information (when available)
   - Status badges and visual indicators
   - Data structure validation
+
+### 📊 Reports Pages Tests
+
+#### Reports Access and Navigation
+
+- **User**: Uses `USERS.owner1` from `test-data` (Owner with reports access)
+- **Flow**: Login → Navigate to different report pages
+- **Checks**:
+  - Successful access to rental reports page
+  - Successful access to income reports page
+  - Successful access to popular vehicles reports page
+  - Navigation between different report sections
+  - Proper page loading and content display
+
+#### Reports Content Verification
+
+- **Rental Reports Page**:
+
+  - Page title: "Reporte de Mis Alquileres"
+  - Description text verification
+  - PDF download button presence
+  - Content loading (data or loading state)
+
+- **Income Reports Page**:
+
+  - Page title: "Reporte de Ingresos"
+  - Owner-specific content verification
+  - Financial data display or loading
+  - PDF generation functionality
+
+- **Popular Vehicles Reports Page**:
+  - Page title: "Vehículos Más Populares"
+  - Ranking content verification
+  - Statistics display
+  - Data visualization elements
+
+#### Reports Functionality Testing
+
+- **Loading States**: Verify proper loading state handling during data fetch
+- **Error Handling**: Test error state display and retry functionality
+- **PDF Generation**: Test PDF download button behavior and state changes
+- **Responsive Design**: Verify page structure and accessibility
+- **Data Validation**: Ensure proper content display or appropriate error messages
 
 ### 🎯 Vehicle Detail Page Testing
 
