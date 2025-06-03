@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { RentalService } from "@/lib/api/services/rental-service";
 import { Rental } from "@/lib/types/entities/rental";
+import { useVehicleDetailsStore } from "@/store/vehicle-details-store";
 
 interface UseOwnerRentalsState {
   rentals: Rental[];
@@ -22,23 +23,37 @@ export const useOwnerRentals = () => {
       console.log("Rentas obtenidas:", rentals);
       setState((prev) => ({ ...prev, rentals, isLoading: false }));
     } catch (error) {
-      setState((prev) => ({
-        ...prev,
-        error:
-          error instanceof Error ? error.message : "Error al cargar las rentas",
-        isLoading: false,
-      }));
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
+      setState((s) => ({ ...s, error: errorMessage }));
     }
   }, []);
 
-  const updateRentalStatus = async (rentalId: string, status: Rental['status']) => {
+  const updateRentalStatus = async (
+    rentalId: string,
+    status: Rental["status"]
+  ) => {
     try {
       let updatedRental: Rental;
 
-      if (status === 'confirmed') {
+      if (status === "confirmed") {
         updatedRental = await RentalService.confirmRental(rentalId);
-      } else if (status === 'cancelled') {
+      } else if (status === "cancelled") {
         updatedRental = await RentalService.rejectRental(rentalId);
+
+        // Encontrar la renta para obtener el vehicle_id
+        const rental = state.rentals.find((r) => r.id === rentalId);
+        if (rental) {
+          // Invalidar el cache del vehículo para forzar actualización
+          useVehicleDetailsStore
+            .getState()
+            .invalidateVehicle(rental.vehicle.id);
+
+          // Re-fetch la disponibilidad inmediatamente
+          await useVehicleDetailsStore
+            .getState()
+            .fetchVehicleUnavailability(rental.vehicle.id, true);
+        }
       } else {
         throw new Error(`Unsupported status: ${status}`);
       }
@@ -49,11 +64,12 @@ export const useOwnerRentals = () => {
           r.id === rentalId ? { ...r, status: updatedRental.status } : r
         ),
       }));
-    } catch (error: any) {
-      setState((s) => ({ ...s, error: error.message }));
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
+      setState((s) => ({ ...s, error: errorMessage }));
     }
   };
-
 
   useEffect(() => {
     fetchRentals();
@@ -63,6 +79,5 @@ export const useOwnerRentals = () => {
     ...state,
     refetch: fetchRentals,
     updateRentalStatus,
-
   };
 };

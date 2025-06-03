@@ -23,6 +23,7 @@ export default function VehicleDetailsPage() {
     reviewsError,
     unavailabilityError,
     fetchVehicleDetails,
+    fetchVehicleUnavailability,
     clearErrors,
   } = useVehicleDetailsStore();
 
@@ -50,8 +51,13 @@ export default function VehicleDetailsPage() {
   useEffect(() => {
     if (vehicleId) {
       fetchVehicleDetails(vehicleId);
+      // Forzar actualización de disponibilidad cada vez que se visita la página
+      // para asegurar datos actualizados después de rechazos de solicitudes
+      setTimeout(() => {
+        fetchVehicleUnavailability(vehicleId, true);
+      }, 1000);
     }
-  }, [vehicleId, fetchVehicleDetails]);
+  }, [vehicleId, fetchVehicleDetails, fetchVehicleUnavailability]);
 
   // Format price to show in Colombian pesos
   const formatPrice = (price: string) => {

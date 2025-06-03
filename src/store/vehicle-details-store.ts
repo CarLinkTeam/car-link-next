@@ -36,6 +36,7 @@ interface VehicleDetailsState {
   invalidateAllVehicles: () => void;
   clearErrors: () => void;
   isDateUnavailable: (vehicleId: string, date: Date) => boolean;
+  refreshVehicleAvailability: (vehicleIds: string[]) => Promise<void>;
 }
 
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutos
@@ -262,6 +263,19 @@ export const useVehicleDetailsStore = create<VehicleDetailsState>()(
           });
           return { vehicles: newVehicles };
         });
+      },
+
+      // Nueva función para invalidar y refrescar múltiples vehículos
+      refreshVehicleAvailability: async (vehicleIds: string[]) => {
+        const { invalidateVehicle, fetchVehicleUnavailability } = get();
+
+        // Invalidar todos los vehículos especificados
+        vehicleIds.forEach((id) => invalidateVehicle(id));
+
+        // Refrescar la disponibilidad de todos en paralelo
+        await Promise.allSettled(
+          vehicleIds.map((id) => fetchVehicleUnavailability(id, true))
+        );
       },
 
       clearErrors: () => {

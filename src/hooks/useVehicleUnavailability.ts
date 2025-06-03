@@ -1,19 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { unavailability } from "@/lib/api";
 import type { UnavailabilityPeriod } from "@/lib/api/services/unavailability-service";
+import { useAutoRefresh } from "./useAutoRefresh";
 
 interface UseVehicleUnavailabilityProps {
   vehicleId: string;
+  autoRefresh?: boolean;
 }
 
 export const useVehicleUnavailability = ({
   vehicleId,
+  autoRefresh = true,
 }: UseVehicleUnavailabilityProps) => {
   const [unavailabilityData, setUnavailabilityData] = useState<
     UnavailabilityPeriod[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const fetchUnavailability = useCallback(async () => {
     if (!vehicleId) return;
 
@@ -32,6 +36,11 @@ export const useVehicleUnavailability = ({
       setIsLoading(false);
     }
   }, [vehicleId]);
+
+  const { forceRefresh } = useAutoRefresh(fetchUnavailability, {
+    enabled: autoRefresh && !!vehicleId,
+    intervalMs: 30000,
+  });
 
   // Función para generar todas las fechas no disponibles incluyendo rangos
   const getUnavailableDates = (): Date[] => {
@@ -78,5 +87,6 @@ export const useVehicleUnavailability = ({
     isLoading,
     error,
     refreshUnavailability: fetchUnavailability,
+    forceRefresh,
   };
 };

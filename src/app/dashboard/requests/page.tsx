@@ -8,7 +8,9 @@ import RentalRequestCard from "@/components/ui/RequestCard";
 export default function OwnerRentalsPage() {
   const { rentals, isLoading, error, updateRentalStatus } = useOwnerRentals();
 
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "pending" | "confirmed" | "cancelled"
+  >("all");
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleAccept = (id: string) => {
@@ -21,14 +23,19 @@ export default function OwnerRentalsPage() {
 
   const filteredRentals = useMemo(() => {
     return rentals
-    .filter((rental) => rental.status !== "completed")
-    .filter((rental) => {
-      const matchesStatus = filterStatus === "all" || rental.status === filterStatus;
-      const matchesSearch =
-        rental.vehicle?.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        rental.vehicle?.vehicleModel.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesStatus && matchesSearch;
-    });
+      .filter((rental) => rental.status !== "completed")
+      .filter((rental) => {
+        const matchesStatus =
+          filterStatus === "all" || rental.status === filterStatus;
+        const matchesSearch =
+          rental.vehicle?.make
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          rental.vehicle?.vehicleModel
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        return matchesStatus && matchesSearch;
+      });
   }, [rentals, filterStatus, searchTerm]);
 
   const getStatusCount = (status: string) =>
@@ -47,19 +54,27 @@ export default function OwnerRentalsPage() {
       {/* Estadísticas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white shadow rounded-lg p-4 text-center">
-          <p className="text-2xl font-bold">{rentals.filter(r => r.status !== "completed").length}</p>
+          <p className="text-2xl font-bold">
+            {rentals.filter((r) => r.status !== "completed").length}
+          </p>
           <p className="text-sm text-gray-500">Total</p>
         </div>
         <div className="bg-white shadow rounded-lg p-4 text-center">
-          <p className="text-2xl font-bold text-yellow-500">{getStatusCount("pending")}</p>
+          <p className="text-2xl font-bold text-yellow-500">
+            {getStatusCount("pending")}
+          </p>
           <p className="text-sm text-gray-500">Pendientes</p>
         </div>
         <div className="bg-white shadow rounded-lg p-4 text-center">
-          <p className="text-2xl font-bold text-green-600">{getStatusCount("confirmed")}</p>
+          <p className="text-2xl font-bold text-green-600">
+            {getStatusCount("confirmed")}
+          </p>
           <p className="text-sm text-gray-500">Confirmadas</p>
         </div>
         <div className="bg-white shadow rounded-lg p-4 text-center">
-          <p className="text-2xl font-bold text-red-500">{getStatusCount("cancelled")}</p>
+          <p className="text-2xl font-bold text-red-500">
+            {getStatusCount("cancelled")}
+          </p>
           <p className="text-sm text-gray-500">Canceladas</p>
         </div>
       </div>
