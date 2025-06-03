@@ -34,6 +34,7 @@ npm run test:e2e
 
 # Specific test suites
 npm run test:e2e:auth      # All auth tests (login + register)
+npm run test:e2e:admin     # Only admin-access tests
 npm run test:e2e:login     # Only login tests
 npm run test:e2e:register  # Only register tests
 npm run test:e2e:errors    # Only error pages tests
