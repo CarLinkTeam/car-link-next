@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { LoginFormData, RegisterFormData } from "@/lib/validations/auth";
 import { AuthUser, UserRole } from "@/lib/types";
-import { auth } from "@/lib/api";
+import { auth, users } from "@/lib/api";
 
 interface AuthState {
   user: AuthUser | null;
@@ -20,6 +20,7 @@ interface AuthState {
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   setHasHydrated: (state: boolean) => void;
+  ensureUserFullName: () => Promise<void>;
 }
 
 // Selectores optimizados
@@ -56,17 +57,17 @@ export const authSelectors = {
   userInfo: (state: AuthState) =>
     state.user
       ? {
-          id: state.user.id,
-          fullName: state.user.fullName,
-          email: state.user.email,
-          roles: state.user.roles,
-        }
+        id: state.user.id,
+        fullName: state.user.fullName,
+        email: state.user.email,
+        roles: state.user.roles,
+      }
       : null,
 };
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -88,6 +89,11 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
+
+          if (!user.fullName) {
+            await get().ensureUserFullName();
+          }
+
         } catch (error) {
           const message =
             error instanceof Error ? error.message : "Error desconocido";
@@ -181,6 +187,25 @@ export const useAuthStore = create<AuthState>()(
       setHasHydrated: (state) => {
         set({ _hasHydrated: state });
       },
+
+      ensureUserFullName: async () => {
+        const currentUser = get().user;
+        if (!currentUser || currentUser.fullName) return;
+
+        set({ isLoading: true });
+        try {
+          const fetchedUser = await users.getById(currentUser.id);
+          set((state) => ({
+            user: { ...state.user, ...fetchedUser },
+            isLoading: false,
+          }));
+        } catch (error) {
+          console.error("Error fetching full user info:", error);
+          set({ isLoading: false });
+        }
+      },
+
+
     }),
     {
       name: "auth-store",
