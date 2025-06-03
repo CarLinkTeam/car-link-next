@@ -7,6 +7,12 @@ import { apiClient } from "../base/client";
 import { Review } from "../../types/entities/review";
 
 export const RentalService = {
+
+  getAll: async (): Promise<Rental[]> => {
+    const response = await apiClient.get<Rental[]>("/rentals");
+    return response;
+  },
+
   create: async (data: CreateRentalData): Promise<Rental> => {
     const response = await apiClient.post<Rental>("/rentals", data);
     return response;
@@ -70,4 +76,13 @@ export const RentalService = {
     const response = await apiClient.patch<Rental>(`/rentals/${id}/reject`);
     return response;
   },
+
+  getById: async (id: string): Promise<Rental> => {
+    const response = await apiClient.get<Rental>(`/rentals/${id}`);
+    return response;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/rentals/${id}`);
+  }
 };

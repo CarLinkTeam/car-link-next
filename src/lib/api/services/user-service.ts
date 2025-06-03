@@ -1,5 +1,5 @@
 import { apiClient } from '../base/client'
-import { AuthUser } from '@/lib/types/entities/user'
+import { AuthUser, User } from '@/lib/types/entities/user'
 
 export interface UpdateUserDto {
   fullName?: string
@@ -9,6 +9,15 @@ export interface UpdateUserDto {
 }
 
 export const UserService = {
+
+  /**
+   * Obtiene todos los usuarios
+   */
+
+  async getAll(): Promise<User[]> {
+    return await apiClient.get<User[]>("/users");
+  },
+
   /**
    * Obtiene los datos completos de un usuario por ID
    */
