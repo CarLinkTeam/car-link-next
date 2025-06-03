@@ -13,6 +13,7 @@ export default function UserDetailPage() {
             getOne={VehicleService.getById}
             onDelete={VehicleService.delete}
             getEditPath={(id) => `/vehicles/${id}/edit`}
+            editOption={false}
             renderDetails={(vehicle) => (
                 <>
                     <DetailItem label="ID" value={vehicle.id} />
