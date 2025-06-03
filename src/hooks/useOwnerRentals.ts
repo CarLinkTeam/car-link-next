@@ -63,6 +63,5 @@ export const useOwnerRentals = () => {
     ...state,
     refetch: fetchRentals,
     updateRentalStatus,
-
   };
 };
