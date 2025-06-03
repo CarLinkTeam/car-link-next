@@ -54,5 +54,21 @@ export const RentalService = {
   updateById: async (id: string, data: Partial<Rental>): Promise<Rental> => {
     const response = await apiClient.patch<Rental>(`/rentals/${id}`, data);
     return response;
+  },
+
+   /**
+   * Confirma una renta pendiente
+   */
+  confirmRental: async (id: string): Promise<Rental> => {
+    const response = await apiClient.patch<Rental>(`/rentals/${id}/confirm`);
+    return response;
+  },
+
+  /**
+   * Rechaza una renta pendiente
+   */
+  rejectRental: async (id: string): Promise<Rental> => {
+    const response = await apiClient.patch<Rental>(`/rentals/${id}/reject`);
+    return response;
   }
 };

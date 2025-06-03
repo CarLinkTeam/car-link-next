@@ -22,7 +22,7 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 btn-gradient rounded-xl flex items-center justify-center">
+              <Link href="/dashboard/vehicles" className="w-10 h-10 btn-gradient rounded-xl flex items-center justify-center">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -36,7 +36,7 @@ export default function DashboardLayout({
                     d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
-              </div>
+              </Link>
               <h1 className="text-2xl font-bold gradient-text">CarLink</h1>
             </div>
 

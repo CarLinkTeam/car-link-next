@@ -33,17 +33,27 @@ export const useOwnerRentals = () => {
 
   const updateRentalStatus = async (rentalId: string, status: Rental['status']) => {
     try {
-      await RentalService.updateById(rentalId, { status });
+      let updatedRental: Rental;
+
+      if (status === 'confirmed') {
+        updatedRental = await RentalService.confirmRental(rentalId);
+      } else if (status === 'cancelled') {
+        updatedRental = await RentalService.rejectRental(rentalId);
+      } else {
+        throw new Error(`Unsupported status: ${status}`);
+      }
+
       setState((s) => ({
         ...s,
         rentals: s.rentals.map((r) =>
-          r.id === rentalId ? { ...r, status } : r
+          r.id === rentalId ? { ...r, status: updatedRental.status } : r
         ),
       }));
     } catch (error: any) {
       setState((s) => ({ ...s, error: error.message }));
     }
   };
+
 
   useEffect(() => {
     fetchRentals();
